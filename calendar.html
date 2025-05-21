@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendar</title>
+  <title>Calendar - Habit Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f4f4;
       display: flex;
-      height: 100vh;
       flex-direction: column;
+      height: 100vh;
     }
     header {
       background: #333;
@@ -35,16 +37,79 @@
       color: white;
       padding: 1em;
     }
-    .calendar-content {
+    .sidebar h2 {
+      color: #fff;
+    }
+    .content {
       flex: 1;
       padding: 1em;
     }
-    iframe {
-      border: 0;
-      width: 100%;
-      height: 100%;
+    #calendar {
+      background: white;
+      padding: 1em;
+      border-radius: 8px;
     }
   </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
+      authDomain: "habit-tracker-7c16d.firebaseapp.com",
+      projectId: "habit-tracker-7c16d",
+      storageBucket: "habit-tracker-7c16d.appspot.com",
+      messagingSenderId: "329214838371",
+      appId: "1:329214838371:web:4d50e8ddedffc72defda56",
+      measurementId: "G-22KVBFSEL5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const eventsRef = collection(db, "calendarEvents");
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const snapshot = await getDocs(eventsRef);
+      const events = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          start: data.start
+        };
+      });
+
+      const calendarEl = document.getElementById("calendar");
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "dayGridMonth",
+        selectable: true,
+        editable: true,
+        events: events,
+        select: async (info) => {
+          const title = prompt("Event title:");
+          if (title) {
+            const newEvent = await addDoc(eventsRef, {
+              title,
+              start: info.startStr
+            });
+            calendar.addEvent({
+              id: newEvent.id,
+              title,
+              start: info.startStr
+            });
+          }
+        },
+        eventClick: async (info) => {
+          if (confirm("Delete this event?")) {
+            await deleteDoc(doc(db, "calendarEvents", info.event.id));
+            info.event.remove();
+          }
+        }
+      });
+
+      calendar.render();
+    });
+  </script>
 </head>
 <body>
   <header>
@@ -55,14 +120,11 @@
   </header>
   <main>
     <div class="sidebar">
-      <h2>Navigation</h2>
-      <p>Access other tools from the top tabs.</p>
+      <h2>Calendar Tools</h2>
+      <p>Select a day to add an event.</p>
     </div>
-    <div class="calendar-content">
-      <iframe 
-        src="https://calendar.google.com/calendar/embed?src=f0397e4573ff5601cb91f31c0d75f4ffbe3ff003970c827463f836628dda1d15%40group.calendar.google.com&ctz=America%2FDenver"
-        scrolling="no">
-      </iframe>
+    <div class="content">
+      <div id="calendar"></div>
     </div>
   </main>
 </body>
