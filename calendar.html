@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendar - Habit Tracker</title>
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
   <style>
+    /* Basic reset & layout */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -14,6 +15,7 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      overflow: hidden;
     }
     header {
       background: #333;
@@ -21,6 +23,7 @@
       padding: 1em;
       display: flex;
       justify-content: space-around;
+      flex-shrink: 0;
     }
     header a {
       color: white;
@@ -29,158 +32,92 @@
     }
     main {
       display: flex;
-      flex: 1;
+      flex: 1 1 auto;
+      overflow: hidden;
     }
     .sidebar {
       width: 250px;
       background: #222;
       color: white;
       padding: 1em;
+      flex-shrink: 0;
+      overflow-y: auto;
     }
     .sidebar h2 {
+      margin-top: 0;
       color: #fff;
     }
     .content {
-      flex: 1;
+      flex: 1 1 auto;
+      position: relative;
       padding: 1em;
+      overflow: hidden;
     }
     #calendar {
+      height: 100%;
+      border-radius: 8px;
       background: white;
-      padding: 1em;
-      border-radius: 8px;
+      overflow: hidden;
     }
-    #event-details {
-      margin-top: 1em;
-      background: #fff;
-      padding: 1em;
+
+    /* Floating popup styling */
+    #event-popup {
+      position: absolute;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       border-radius: 8px;
+      padding: 1em;
+      width: 280px;
+      z-index: 1000;
       display: none;
+      cursor: move;
+      user-select: none;
     }
-    #delete-btn {
-      margin-top: 1em;
-      background-color: red;
-      color: white;
+    #event-popup h3 {
+      margin-top: 0;
+      margin-bottom: 0.5em;
+    }
+    #event-popup p {
+      margin: 0.25em 0;
+    }
+    #event-popup button {
+      margin-top: 0.75em;
+      margin-right: 0.5em;
+      padding: 0.4em 0.8em;
       border: none;
-      padding: 0.5em 1em;
+      border-radius: 4px;
       cursor: pointer;
+      font-weight: bold;
+    }
+    #event-popup button#edit-btn {
+      background: #4caf50;
+      color: white;
+    }
+    #event-popup button#delete-btn {
+      background: #f44336;
+      color: white;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 700px) {
+      main {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: 150px;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+      .content {
+        flex: 1 1 auto;
+        padding: 0.5em;
+      }
+      #calendar {
+        height: 100%;
+      }
     }
   </style>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
-      authDomain: "habit-tracker-7c16d.firebaseapp.com",
-      projectId: "habit-tracker-7c16d",
-      storageBucket: "habit-tracker-7c16d.appspot.com",
-      messagingSenderId: "329214838371",
-      appId: "1:329214838371:web:4d50e8ddedffc72defda56",
-      measurementId: "G-22KVBFSEL5"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const eventsRef = collection(db, "calendarEvents");
-
-    let selectedEvent = null;
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      const snapshot = await getDocs(eventsRef);
-      const events = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          title: data.title,
-          start: data.start,
-          end: data.end || null,
-          extendedProps: {
-            description: data.description || "",
-            category: data.category || ""
-          }
-        };
-      });
-
-      const calendarEl = document.getElementById("calendar");
-      const eventDetails = document.getElementById("event-details");
-      const eventTitle = document.getElementById("event-title");
-      const eventDesc = document.getElementById("event-desc");
-      const eventCat = document.getElementById("event-cat");
-      const deleteBtn = document.getElementById("delete-btn");
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "dayGridMonth",
-        selectable: true,
-        editable: true,
-        eventStartEditable: true,
-        eventDurationEditable: true,
-        eventResizableFromStart: true,
-        headerToolbar: {
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
-        },
-        events: events,
-        select: async (info) => {
-          const title = prompt("Event title:");
-          const description = prompt("Event description:");
-          const category = prompt("Event category (e.g., Work, Health):");
-          if (title) {
-            const newEvent = await addDoc(eventsRef, {
-              title,
-              start: info.startStr,
-              end: info.endStr,
-              description,
-              category
-            });
-            calendar.addEvent({
-              id: newEvent.id,
-              title,
-              start: info.startStr,
-              end: info.endStr,
-              extendedProps: { description, category }
-            });
-          }
-        },
-        eventClick: (info) => {
-          selectedEvent = info.event;
-          eventTitle.textContent = `Title: ${info.event.title}`;
-          eventDesc.textContent = `Description: ${info.event.extendedProps.description}`;
-          eventCat.textContent = `Category: ${info.event.extendedProps.category}`;
-          eventDetails.style.display = "block";
-        },
-        eventDrop: async (info) => {
-          const eventDoc = doc(db, "calendarEvents", info.event.id);
-          await updateDoc(eventDoc, {
-            start: info.event.startStr,
-            end: info.event.endStr
-          });
-        },
-        eventResize: async (info) => {
-          const eventDoc = doc(db, "calendarEvents", info.event.id);
-          await updateDoc(eventDoc, {
-            start: info.event.startStr,
-            end: info.event.endStr
-          });
-        },
-        eventDidMount: function(info) {
-          const tooltip = `${info.event.title}\n${info.event.extendedProps.description}\nCategory: ${info.event.extendedProps.category}`;
-          info.el.setAttribute("title", tooltip);
-        }
-      });
-
-      deleteBtn.addEventListener("click", async () => {
-        if (selectedEvent) {
-          await deleteDoc(doc(db, "calendarEvents", selectedEvent.id));
-          selectedEvent.remove();
-          eventDetails.style.display = "none";
-          selectedEvent = null;
-        }
-      });
-
-      calendar.render();
-    });
-  </script>
 </head>
 <body>
   <header>
@@ -197,13 +134,264 @@
     </div>
     <div class="content">
       <div id="calendar"></div>
-      <div id="event-details">
-        <p id="event-title"></p>
-        <p id="event-desc"></p>
-        <p id="event-cat"></p>
-        <button id="delete-btn">Delete Event</button>
+
+      <!-- Floating Event Popup -->
+      <div id="event-popup" tabindex="0">
+        <h3 id="popup-title"></h3>
+        <p><strong>Description:</strong> <span id="popup-description"></span></p>
+        <p><strong>Category:</strong> <span id="popup-category"></span></p>
+        <button id="edit-btn">Edit</button>
+        <button id="delete-btn">Delete</button>
       </div>
     </div>
   </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      addDoc,
+      deleteDoc,
+      updateDoc,
+      doc,
+    } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
+      authDomain: "habit-tracker-7c16d.firebaseapp.com",
+      projectId: "habit-tracker-7c16d",
+      storageBucket: "habit-tracker-7c16d.appspot.com",
+      messagingSenderId: "329214838371",
+      appId: "1:329214838371:web:4d50e8ddedffc72defda56",
+      measurementId: "G-22KVBFSEL5",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const eventsRef = collection(db, "calendarEvents");
+
+    // Drag helpers for popup
+    function makeDraggable(el) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+      el.onpointerdown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onpointerup = closeDragElement;
+        document.onpointermove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+
+        let newTop = el.offsetTop - pos2;
+        let newLeft = el.offsetLeft - pos1;
+
+        // constrain within parent
+        const parentRect = el.parentElement.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+
+        if (newTop < 0) newTop = 0;
+        if (newLeft < 0) newLeft = 0;
+        if (newTop + elRect.height > parentRect.height) newTop = parentRect.height - elRect.height;
+        if (newLeft + elRect.width > parentRect.width) newLeft = parentRect.width - elRect.width;
+
+        el.style.top = newTop + "px";
+        el.style.left = newLeft + "px";
+      }
+
+      function closeDragElement() {
+        document.onpointerup = null;
+        document.onpointermove = null;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Load events from Firestore
+      const snapshot = await getDocs(eventsRef);
+      const events = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          start: data.start,
+          end: data.end || null,
+          extendedProps: {
+            description: data.description || "",
+            category: data.category || "",
+          },
+        };
+      });
+
+      const calendarEl = document.getElementById("calendar");
+      const popup = document.getElementById("event-popup");
+      const popupTitle = document.getElementById("popup-title");
+      const popupDescription = document.getElementById("popup-description");
+      const popupCategory = document.getElementById("popup-category");
+      const editBtn = document.getElementById("edit-btn");
+      const deleteBtn = document.getElementById("delete-btn");
+
+      let selectedEvent = null;
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "dayGridMonth",
+        selectable: true,
+        editable: true,
+        eventStartEditable: true,
+        eventDurationEditable: true,
+        eventResizableFromStart: true,
+        headerToolbar: {
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+        },
+        events: events,
+        select: async (info) => {
+          const title = prompt("Event title:");
+          if (!title) return;
+          const description = prompt("Event description:") || "";
+          const category = prompt("Event category (e.g., Work, Health):") || "";
+
+          const newEvent = await addDoc(eventsRef, {
+            title,
+            start: info.startStr,
+            end: info.endStr,
+            description,
+            category,
+          });
+          calendar.addEvent({
+            id: newEvent.id,
+            title,
+            start: info.startStr,
+            end: info.endStr,
+            extendedProps: { description, category },
+          });
+        },
+        eventClick: (info) => {
+          selectedEvent = info.event;
+
+          // Fill popup with event data
+          popupTitle.textContent = selectedEvent.title;
+          popupDescription.textContent = selectedEvent.extendedProps.description || "(No description)";
+          popupCategory.textContent = selectedEvent.extendedProps.category || "(No category)";
+
+          // Position popup near event element
+          const rect = info.jsEvent.target.getBoundingClientRect();
+          const parentRect = calendarEl.getBoundingClientRect();
+
+          let left = rect.left - parentRect.left + window.scrollX + 10;
+          let top = rect.top - parentRect.top + window.scrollY + 10;
+
+          // If near right edge, adjust left so popup fits inside
+          if (left + popup.offsetWidth > parentRect.width) {
+            left = parentRect.width - popup.offsetWidth - 10;
+          }
+          // If near bottom edge, adjust top
+          if (top + popup.offsetHeight > parentRect.height) {
+            top = parentRect.height - popup.offsetHeight - 10;
+          }
+
+          popup.style.left = left + "px";
+          popup.style.top = top + "px";
+          popup.style.display = "block";
+          popup.focus();
+        },
+        eventDrop: async (info) => {
+          const eventDoc = doc(db, "calendarEvents", info.event.id);
+          await updateDoc(eventDoc, {
+            start: info.event.startStr,
+            end: info.event.endStr,
+          });
+          if (selectedEvent && selectedEvent.id === info.event.id) {
+            selectedEvent = info.event;
+          }
+        },
+        eventResize: async (info) => {
+          const eventDoc = doc(db, "calendarEvents", info.event.id);
+          await updateDoc(eventDoc, {
+            start: info.event.startStr,
+            end: info.event.endStr,
+          });
+          if (selectedEvent && selectedEvent.id === info.event.id) {
+            selectedEvent = info.event;
+          }
+        },
+        eventDidMount: function (info) {
+          const tooltip = `${info.event.title}\n${info.event.extendedProps.description}\nCategory: ${info.event.extendedProps.category}`;
+          info.el.setAttribute("title", tooltip);
+        },
+      });
+
+      calendar.render();
+
+      // Hide popup when clicking outside
+      document.addEventListener("click", (e) => {
+        if (!popup.contains(e.target) && !e.target.classList.contains("fc-event-title") && !e.target.closest(".fc-event")) {
+          popup.style.display = "none";
+          selectedEvent = null;
+        }
+      });
+
+      // Delete button handler
+      deleteBtn.addEventListener("click", async () => {
+        if (!selectedEvent) return;
+        if (confirm(`Delete event "${selectedEvent.title}"?`)) {
+          await deleteDoc(doc(db, "calendarEvents", selectedEvent.id));
+          selectedEvent.remove();
+          popup.style.display = "none";
+          selectedEvent = null;
+        }
+      });
+
+      // Edit button handler (basic)
+      editBtn.addEventListener("click", async () => {
+        if (!selectedEvent) return;
+        const newTitle = prompt("Edit event title:", selectedEvent.title);
+        if (!newTitle) return;
+        const newDescription = prompt("Edit description:", selectedEvent.extendedProps.description);
+        const newCategory = prompt("Edit category:", selectedEvent.extendedProps.category);
+
+        const eventDoc = doc(db, "calendarEvents", selectedEvent.id);
+        await updateDoc(eventDoc, {
+          title: newTitle,
+          description: newDescription,
+          category: newCategory,
+        });
+
+        // Update event locally
+        selectedEvent.setProp("title", newTitle);
+        selectedEvent.setExtendedProp("description", newDescription);
+        selectedEvent.setExtendedProp("category", newCategory);
+
+        // Update popup
+        popupTitle.textContent = newTitle;
+        popupDescription.textContent = newDescription || "(No description)";
+        popupCategory.textContent = newCategory || "(No category)";
+      });
+
+      // Make popup draggable
+      makeDraggable(popup);
+
+      // Adjust calendar height on window resize
+      function adjustCalendarHeight() {
+        const headerHeight = document.querySelector("header").offsetHeight;
+        const mainHeight = window.innerHeight - headerHeight;
+        document.querySelector("main").style.height = mainHeight + "px";
+        document.querySelector(".content").style.height = mainHeight + "px";
+        calendarEl.style.height = mainHeight - 32 + "px"; // minus padding
+      }
+      adjustCalendarHeight();
+      window.addEventListener("resize", adjustCalendarHeight);
+    });
+  </script>
 </body>
 </html>
