@@ -52,7 +52,7 @@
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
@@ -75,7 +75,12 @@
         return {
           id: doc.id,
           title: data.title,
-          start: data.start
+          start: data.start,
+          end: data.end || null,
+          extendedProps: {
+            description: data.description || "",
+            category: data.category || ""
+          }
         };
       });
 
@@ -84,26 +89,60 @@
         initialView: "dayGridMonth",
         selectable: true,
         editable: true,
+        eventStartEditable: true,
+        eventDurationEditable: true,
+        eventResizableFromStart: true,
+        headerToolbar: {
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+        },
         events: events,
         select: async (info) => {
           const title = prompt("Event title:");
+          const description = prompt("Event description:");
+          const category = prompt("Event category (e.g., Work, Health):");
           if (title) {
             const newEvent = await addDoc(eventsRef, {
               title,
-              start: info.startStr
+              start: info.startStr,
+              end: info.endStr,
+              description,
+              category
             });
             calendar.addEvent({
               id: newEvent.id,
               title,
-              start: info.startStr
+              start: info.startStr,
+              end: info.endStr,
+              extendedProps: { description, category }
             });
           }
         },
         eventClick: async (info) => {
-          if (confirm("Delete this event?")) {
+          const action = confirm("Click OK to delete or Cancel to leave unchanged.");
+          if (action) {
             await deleteDoc(doc(db, "calendarEvents", info.event.id));
             info.event.remove();
           }
+        },
+        eventDrop: async (info) => {
+          const eventDoc = doc(db, "calendarEvents", info.event.id);
+          await updateDoc(eventDoc, {
+            start: info.event.startStr,
+            end: info.event.endStr
+          });
+        },
+        eventResize: async (info) => {
+          const eventDoc = doc(db, "calendarEvents", info.event.id);
+          await updateDoc(eventDoc, {
+            start: info.event.startStr,
+            end: info.event.endStr
+          });
+        },
+        eventDidMount: function(info) {
+          const tooltip = `${info.event.title}\n${info.event.extendedProps.description}\nCategory: ${info.event.extendedProps.category}`;
+          info.el.setAttribute("title", tooltip);
         }
       });
 
@@ -122,6 +161,7 @@
     <div class="sidebar">
       <h2>Calendar Tools</h2>
       <p>Select a day to add an event.</p>
+      <p>Drag events to reschedule or resize for duration.</p>
     </div>
     <div class="content">
       <div id="calendar"></div>
