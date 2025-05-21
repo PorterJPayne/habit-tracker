@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Habit Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #fff;
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+  </style>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
+      authDomain: "habit-tracker-7c16d.firebaseapp.com",
+      projectId: "habit-tracker-7c16d",
+      storageBucket: "habit-tracker-7c16d.appspot.com",
+      messagingSenderId: "329214838371",
+      appId: "1:329214838371:web:4d50e8ddedffc72defda56",
+      measurementId: "G-22KVBFSEL5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const habitsRef = collection(db, "habits");
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("habit-input");
+      const list = document.getElementById("habit-list");
+
+      async function renderHabits() {
+        const snapshot = await getDocs(habitsRef);
+        list.innerHTML = "";
+        snapshot.forEach(docSnap => {
+          const habit = docSnap.data();
+          const li = document.createElement("li");
+          li.className = habit.completed ? "completed" : "";
+
+          const text = document.createElement("span");
+          text.textContent = habit.name;
+          text.onclick = () => toggleHabit(docSnap.id, habit.completed);
+
+          const del = document.createElement("button");
+          del.textContent = "Delete";
+          del.onclick = () => deleteHabit(docSnap.id);
+
+          li.appendChild(text);
+          li.appendChild(del);
+          list.appendChild(li);
+        });
+      }
+
+      async function addHabit() {
+        const name = input.value.trim();
+        if (name) {
+          await addDoc(habitsRef, { name, completed: false });
+          input.value = "";
+          renderHabits();
+        }
+      }
+
+      async function toggleHabit(id, currentStatus) {
+        await updateDoc(doc(db, "habits", id), { completed: !currentStatus });
+        renderHabits();
+      }
+
+      async function deleteHabit(id) {
+        await deleteDoc(doc(db, "habits", id));
+        renderHabits();
+      }
+
+      document.querySelector("button").addEventListener("click", addHabit);
+      renderHabits();
+    });
+  </script>
+</head>
+<body>
+  <h1>Habit Tracker</h1>
+  <input id="habit-input" type="text" placeholder="Enter new habit" />
+  <button>Add Habit</button>
+  <ul id="habit-list"></ul>
+</body>
+</html>
