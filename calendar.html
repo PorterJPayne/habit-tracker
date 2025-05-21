@@ -49,6 +49,21 @@
       padding: 1em;
       border-radius: 8px;
     }
+    #event-details {
+      margin-top: 1em;
+      background: #fff;
+      padding: 1em;
+      border-radius: 8px;
+      display: none;
+    }
+    #delete-btn {
+      margin-top: 1em;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 0.5em 1em;
+      cursor: pointer;
+    }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
@@ -68,6 +83,8 @@
     const db = getFirestore(app);
     const eventsRef = collection(db, "calendarEvents");
 
+    let selectedEvent = null;
+
     document.addEventListener("DOMContentLoaded", async () => {
       const snapshot = await getDocs(eventsRef);
       const events = snapshot.docs.map(doc => {
@@ -85,6 +102,12 @@
       });
 
       const calendarEl = document.getElementById("calendar");
+      const eventDetails = document.getElementById("event-details");
+      const eventTitle = document.getElementById("event-title");
+      const eventDesc = document.getElementById("event-desc");
+      const eventCat = document.getElementById("event-cat");
+      const deleteBtn = document.getElementById("delete-btn");
+
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: "dayGridMonth",
         selectable: true,
@@ -119,12 +142,12 @@
             });
           }
         },
-        eventClick: async (info) => {
-          const action = confirm("Click OK to delete or Cancel to leave unchanged.");
-          if (action) {
-            await deleteDoc(doc(db, "calendarEvents", info.event.id));
-            info.event.remove();
-          }
+        eventClick: (info) => {
+          selectedEvent = info.event;
+          eventTitle.textContent = `Title: ${info.event.title}`;
+          eventDesc.textContent = `Description: ${info.event.extendedProps.description}`;
+          eventCat.textContent = `Category: ${info.event.extendedProps.category}`;
+          eventDetails.style.display = "block";
         },
         eventDrop: async (info) => {
           const eventDoc = doc(db, "calendarEvents", info.event.id);
@@ -143,6 +166,15 @@
         eventDidMount: function(info) {
           const tooltip = `${info.event.title}\n${info.event.extendedProps.description}\nCategory: ${info.event.extendedProps.category}`;
           info.el.setAttribute("title", tooltip);
+        }
+      });
+
+      deleteBtn.addEventListener("click", async () => {
+        if (selectedEvent) {
+          await deleteDoc(doc(db, "calendarEvents", selectedEvent.id));
+          selectedEvent.remove();
+          eventDetails.style.display = "none";
+          selectedEvent = null;
         }
       });
 
@@ -165,6 +197,12 @@
     </div>
     <div class="content">
       <div id="calendar"></div>
+      <div id="event-details">
+        <p id="event-title"></p>
+        <p id="event-desc"></p>
+        <p id="event-cat"></p>
+        <button id="delete-btn">Delete Event</button>
+      </div>
     </div>
   </main>
 </body>
