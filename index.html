@@ -3,19 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple Habit Tracker</title>
+  <title>Advanced Habit Tracker</title>
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f9f9f9;
+      background: #f4f4f4;
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
     }
-    h1 {
+    header {
+      background: #333;
+      color: #fff;
+      padding: 1em;
+      display: flex;
+      justify-content: space-around;
+    }
+    header a {
+      color: white;
+      text-decoration: none;
+      padding: 0 1em;
+    }
+    main {
+      display: flex;
+      flex: 1;
+    }
+    .sidebar {
+      width: 250px;
+      background: #222;
+      color: white;
+      padding: 1em;
+    }
+    .sidebar h2 {
+      color: #fff;
+    }
+    .content {
+      display: flex;
+      flex: 1;
+      padding: 1em;
+      gap: 2em;
+    }
+    .goals-section, .tasks-section {
+      flex: 1;
+    }
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1em;
+    }
+    .goal-card {
+      background: white;
+      padding: 1em;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
+    .goal-card img {
+      max-width: 60px;
+      margin-bottom: 0.5em;
     }
     ul {
       list-style: none;
@@ -33,6 +81,11 @@
     .completed {
       text-decoration: line-through;
       color: gray;
+    }
+    input, button {
+      padding: 8px;
+      margin-top: 10px;
+      width: 100%;
     }
   </style>
   <!-- Firebase SDKs -->
@@ -99,15 +152,67 @@
         renderHabits();
       }
 
-      document.querySelector("button").addEventListener("click", addHabit);
+      document.getElementById("add-habit-button").addEventListener("click", addHabit);
       renderHabits();
     });
   </script>
 </head>
 <body>
-  <h1>Habit Tracker</h1>
-  <input id="habit-input" type="text" placeholder="Enter new habit" />
-  <button>Add Habit</button>
-  <ul id="habit-list"></ul>
+  <header>
+    <a href="index.html">Home</a>
+    <a href="calendar.html">Calendar</a>
+    <a href="exercise.html">Exercise Plan</a>
+    <a href="progress.html">Progress Charts</a>
+  </header>
+  <main>
+    <div class="sidebar">
+      <h2>Add Habit</h2>
+      <input id="habit-input" type="text" placeholder="Enter new habit" />
+      <button id="add-habit-button">Add Habit</button>
+    </div>
+    <div class="content">
+      <div class="goals-section">
+        <h2>Goals</h2>
+        <div class="goals-grid">
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 1" />
+            <p>Read 30 mins</p>
+          </div>
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 2" />
+            <p>Workout</p>
+          </div>
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 3" />
+            <p>Meditate</p>
+          </div>
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 4" />
+            <p>Drink Water</p>
+          </div>
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 5" />
+            <p>Journal</p>
+          </div>
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 6" />
+            <p>Stretch</p>
+          </div>
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 7" />
+            <p>Sleep 8 hrs</p>
+          </div>
+          <div class="goal-card">
+            <img src="https://via.placeholder.com/60" alt="Goal 8" />
+            <p>Clean Room</p>
+          </div>
+        </div>
+      </div>
+      <div class="tasks-section">
+        <h2>Today's Habits</h2>
+        <ul id="habit-list"></ul>
+      </div>
+    </div>
+  </main>
 </body>
 </html>
