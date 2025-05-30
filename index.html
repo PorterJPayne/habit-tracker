@@ -1,481 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Advanced Habit Tracker</title>
-<link rel="manifest" href="/manifest.json" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="MyApp" />
-<link rel="apple-touch-icon" href="/icons/icon-192.png" />
-<style>
-  /* Reset & base styles */
-  * {
-    box-sizing: border-box;
-  }
-  body, html {
-    margin: 0; padding: 0; height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f9fafb;
-    color: #222;
-  }
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  header {
-    background: #2563eb;
-    color: white;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  header nav a {
-    margin-left: 1.25rem;
-    font-weight: 600;
-  }
-  main {
-    display: flex;
-    height: calc(100vh - 56px);
-    overflow: hidden;
-  }
-  .sidebar {
-    background: #1e40af;
-    color: white;
-    width: 280px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-  }
-  .sidebar h2 {
-    margin-top: 0;
-  }
-  .sidebar button {
-    background: #3b82f6;
-    border: none;
-    color: white;
-    padding: 0.75rem;
-    margin-top: 1rem;
-    cursor: pointer;
-    font-weight: 600;
-    border-radius: 4px;
-    transition: background 0.3s ease;
-  }
-  .sidebar button:hover {
-    background: #60a5fa;
-  }
-  .content {
-    flex: 1;
-    padding: 1rem 2rem;
-    overflow-y: auto;
-  }
-  h1, h2 {
-    margin-bottom: 0.5rem;
-  }
-  input[type="text"], textarea, select {
-    width: 100%;
-    padding: 0.5rem;
-    margin-top: 0.25rem;
-    margin-bottom: 1rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  textarea {
-    resize: vertical;
-  }
-  label {
-    font-weight: 600;
-  }
-  .btn-primary {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .btn-primary:hover {
-    background: #3b82f6;
-  }
-  .habit-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .habit-item {
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    display: flex;
-    flex-direction: column;
-  }
-  .habit-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .habit-name {
-    font-weight: 700;
-    font-size: 1.2rem;
-  }
-  .habit-done-btn {
-    background: #10b981;
-    border: none;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .habit-done-btn.done {
-    background: #6ee7b7;
-  }
-  .habit-notes {
-    margin-top: 0.75rem;
-  }
-  .journal-section {
-    margin-top: 2rem;
-    background: white;
-    padding: 1rem;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
-  }
-  .journal-entry {
-    margin-bottom: 1rem;
-  }
-  .vision-section label {
-    display: block;
-  }
-  .vision-section {
-    background: white;
-    padding: 1rem;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
-    margin-bottom: 2rem;
-  }
-  /* Responsive */
-  @media (max-width: 720px) {
-    main {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Habit Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
       flex-direction: column;
-      height: auto;
+      height: 100vh;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header a {
+      color: white;
+      text-decoration: none;
+      margin-left: 1em;
+    }
+    .logout-button {
+      background: none;
+      border: 1px solid white;
+      color: white;
+      padding: 0.5em 1em;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    main {
+      flex: 1;
+      display: flex;
     }
     .sidebar {
-      width: 100%;
-      flex-direction: row;
-      overflow-x: auto;
-      padding: 0.5rem;
-      gap: 1rem;
-    }
-    .sidebar h2 {
-      display: none;
+      width: 250px;
+      background-color: #222;
+      color: white;
+      padding: 1em;
     }
     .content {
-      padding: 1rem 1rem 2rem 1rem;
+      flex: 1;
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
     }
-    .habit-item {
-      padding: 0.75rem;
-    }
-  }
-</style>
-<!-- Firebase SDKs -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-  import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot, query, where, addDoc, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
-    authDomain: "habit-tracker-7c16d.firebaseapp.com",
-    projectId: "habit-tracker-7c16d",
-    storageBucket: "habit-tracker-7c16d.appspot.com",
-    messagingSenderId: "329214838371",
-    appId: "1:329214838371:web:4d50e8ddedffc72defda56",
-    measurementId: "G-22KVBFSEL5"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
-
-  // Globals
-  let currentUser = null;
-
-  // DOM Elements
-  const sidebar = document.createElement("div");
-  sidebar.className = "sidebar";
-  const content = document.createElement("div");
-  content.className = "content";
-
-  // Main container to append
-  const main = document.createElement("main");
-  main.appendChild(sidebar);
-  main.appendChild(content);
-  document.body.appendChild(main);
-
-  // Clear content helper
-  function clearContent() {
-    content.innerHTML = "";
-  }
-
-  // Render login button or user info
-  function renderAuthUI(user) {
-    sidebar.innerHTML = "";
-    if (user) {
-      currentUser = user;
-      const userEmail = document.createElement("div");
-      userEmail.textContent = `Signed in as ${user.email}`;
-      userEmail.style.marginBottom = "1rem";
-      sidebar.appendChild(userEmail);
-
-      const logoutBtn = document.createElement("button");
-      logoutBtn.textContent = "Sign Out";
-      logoutBtn.onclick = () => signOut(auth);
-      sidebar.appendChild(logoutBtn);
-
-      // Load main app UI
-      loadAppUI();
-    } else {
-      currentUser = null;
-      const loginBtn = document.createElement("button");
-      loginBtn.textContent = "Sign In with Google";
-      loginBtn.onclick = () => {
-        const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider).catch(console.error);
-      };
-      sidebar.appendChild(loginBtn);
-      clearContent();
-    }
-  }
-
-  // Load the main app UI after login
-  async function loadAppUI() {
-    clearContent();
-
-    // Vision Section
-    const visionSection = document.createElement("section");
-    visionSection.className = "vision-section";
-    visionSection.innerHTML = `
-      <h2>Your Vision & Identity</h2>
-      <form id="vision-form">
-        <label for="fitness-goals">Fitness Goals</label>
-        <input type="text" id="fitness-goals" name="fitnessGoals" placeholder="E.g. Workout 4x a week" />
-        <label for="reading-goals">Reading/Spiritual Goals</label>
-        <input type="text" id="reading-goals" name="readingGoals" placeholder="E.g. Read Book of Mormon daily" />
-        <label for="financial-goals">Financial Goals</label>
-        <input type="text" id="financial-goals" name="financialGoals" placeholder="E.g. Track spending monthly" />
-        <label for="core-values">Core Values</label>
-        <textarea id="core-values" name="coreValues" rows="3" placeholder="E.g. Integrity, Discipline, Kindness"></textarea>
-        <label for="daily-habits-overview">Daily Habits Overview</label>
-        <textarea id="daily-habits-overview" name="dailyHabitsOverview" rows="2" placeholder="E.g. Exercise, Read, Meditate"></textarea>
-        <label for="dream-self">Dream Self Description</label>
-        <textarea id="dream-self" name="dreamSelf" rows="4" placeholder="Describe your ideal future self"></textarea>
-        <button type="submit" class="btn-primary">Save Vision</button>
-      </form>
-    `;
-    content.appendChild(visionSection);
-
-    // Load saved vision data if exists
-    const visionDocRef = doc(db, "users", currentUser.uid, "meta", "vision");
-    const visionDocSnap = await getDoc(visionDocRef);
-    if (visionDocSnap.exists()) {
-      const data = visionDocSnap.data();
-      document.getElementById("fitness-goals").value = data.fitnessGoals || "";
-      document.getElementById("reading-goals").value = data.readingGoals || "";
-      document.getElementById("financial-goals").value = data.financialGoals || "";
-      document.getElementById("core-values").value = data.coreValues || "";
-      document.getElementById("daily-habits-overview").value = data.dailyHabitsOverview || "";
-      document.getElementById("dream-self").value = data.dreamSelf || "";
-    }
-
-    // Vision form save handler
-    document.getElementById("vision-form").addEventListener("submit", async e => {
-      e.preventDefault();
-      const visionData = {
-        fitnessGoals: e.target.fitnessGoals.value.trim(),
-        readingGoals: e.target.readingGoals.value.trim(),
-        financialGoals: e.target.financialGoals.value.trim(),
-        coreValues: e.target.coreValues.value.trim(),
-        dailyHabitsOverview: e.target.dailyHabitsOverview.value.trim(),
-        dreamSelf: e.target.dreamSelf.value.trim()
-      };
-      await setDoc(visionDocRef, visionData);
-      alert("Vision saved!");
-    });
-
-    // Habits Section
-    const habitsSection = document.createElement("section");
-    habitsSection.innerHTML = `<h2>Your Habits</h2><ul id="habit-list" class="habit-list"></ul><button id="add-habit-btn" class="btn-primary">Add New Habit</button>`;
-    content.appendChild(habitsSection);
-
-    // Load and render habits
-    const habitsCollection = collection(db, "users", currentUser.uid, "habits");
-
-    function formatDate(d) {
-      return d.toISOString().split("T")[0];
-    }
-
-    // For simplicity: only track completion for today
-    const todayStr = formatDate(new Date());
-
-    // Render habits
-    async function renderHabits() {
-      const habitList = document.getElementById("habit-list");
-      habitList.innerHTML = "";
-
-      const habitsSnap = await getDocs(habitsCollection);
-      if (habitsSnap.empty) {
-        habitList.innerHTML = "<p>No habits yet. Click 'Add New Habit' to start.</p>";
-        return;
-      }
-
-      habitsSnap.forEach(async (habitDoc) => {
-        const habit = habitDoc.data();
-        const habitId = habitDoc.id;
-
-        // Fetch today’s completion doc for this habit
-        const completionDocRef = doc(db, "users", currentUser.uid, "habits", habitId, "completions", todayStr);
-        const completionSnap = await getDoc(completionDocRef);
-        const done = completionSnap.exists() ? completionSnap.data().done : false;
-        const note = completionSnap.exists() ? completionSnap.data().note || "" : "";
-
-        // Habit item container
-        const li = document.createElement("li");
-        li.className = "habit-item";
-
-        // Header
-        const headerDiv = document.createElement("div");
-        headerDiv.className = "habit-header";
-
-        const nameSpan = document.createElement("span");
-        nameSpan.className = "habit-name";
-        nameSpan.textContent = habit.name;
-        headerDiv.appendChild(nameSpan);
-
-        const doneBtn = document.createElement("button");
-        doneBtn.className = "habit-done-btn";
-        doneBtn.textContent = done ? "Completed ✓" : "Mark Done";
-        if (done) doneBtn.classList.add("done");
-        doneBtn.onclick = async () => {
-          // Toggle done state
-          const newDone = !done;
-          await setDoc(completionDocRef, {
-            done: newDone,
-            note: newDone ? note : ""
-          });
-          renderHabits();
-        };
-        headerDiv.appendChild(doneBtn);
-        li.appendChild(headerDiv);
-
-        // Note input (optional)
-        if (done) {
-          const noteLabel = document.createElement("label");
-          noteLabel.textContent = "Note (optional):";
-          noteLabel.htmlFor = `note-${habitId}`;
-
-          const noteInput = document.createElement("textarea");
-          noteInput.id = `note-${habitId}`;
-          noteInput.className = "habit-notes";
-          noteInput.rows = 2;
-          noteInput.placeholder = "Add a note for today's habit completion...";
-          noteInput.value = note;
-          noteInput.onchange = async (ev) => {
-            await updateDoc(completionDocRef, { note: ev.target.value });
-          };
-
-          li.appendChild(noteLabel);
-          li.appendChild(noteInput);
-        }
-
-        habitList.appendChild(li);
-      });
-    }
-
-    await renderHabits();
-
-    // Add habit button handler
-    document.getElementById("add-habit-btn").onclick = () => {
-      // Pop up prompt for new habit name
-      const newHabitName = prompt("Enter new habit name:");
-      if (newHabitName && newHabitName.trim() !== "") {
-        addDoc(habitsCollection, { name: newHabitName.trim() }).then(() => renderHabits());
-      }
-    };
-
-    // Journaling Section
-    const journalSection = document.createElement("section");
-    journalSection.className = "journal-section";
-    journalSection.innerHTML = `
-      <h2>Journal</h2>
-      <form id="journal-form">
-        <label for="journal-date">Date</label>
-        <input type="date" id="journal-date" name="journalDate" value="${todayStr}" required />
-        <label for="journal-text">Entry</label>
-        <textarea id="journal-text" name="journalText" rows="5" placeholder="Write your thoughts here..." required></textarea>
-        <button type="submit" class="btn-primary">Save Journal Entry</button>
-      </form>
-      <div id="journal-entries"></div>
-    `;
-    content.appendChild(journalSection);
-
-    // Load and render journal entries
-    async function renderJournalEntries() {
-      const entriesContainer = document.getElementById("journal-entries");
-      entriesContainer.innerHTML = "<h3>Previous Entries</h3>";
-      const journalCol = collection(db, "users", currentUser.uid, "journal");
-      const journalQuery = query(journalCol, orderBy("date", "desc"));
-      const journalSnap = await getDocs(journalQuery);
-
-      if (journalSnap.empty) {
-        entriesContainer.innerHTML += "<p>No journal entries yet.</p>";
-        return;
-      }
-
-      journalSnap.forEach(docSnap => {
-        const entry = docSnap.data();
-        const entryDiv = document.createElement("div");
-        entryDiv.className = "journal-entry";
-        entryDiv.innerHTML = `<strong>${entry.date}</strong><p>${entry.text}</p>`;
-        entriesContainer.appendChild(entryDiv);
-      });
-    }
-
-    await renderJournalEntries();
-
-    // Journal form submit
-    document.getElementById("journal-form").addEventListener("submit", async e => {
-      e.preventDefault();
-      const date = e.target.journalDate.value;
-      const text = e.target.journalText.value.trim();
-
-      if (!date || !text) {
-        alert("Please enter both date and journal text.");
-        return;
-      }
-      const journalDocRef = doc(db, "users", currentUser.uid, "journal", date);
-      await setDoc(journalDocRef, { date, text });
-      alert("Journal entry saved.");
-      e.target.journalText.value = "";
-      await renderJournalEntries();
-    });
-  }
-
-  // Listen to auth state changes
-  onAuthStateChanged(auth, user => {
-    renderAuthUI(user);
-  });
-</script>
+  </style>
 </head>
 <body>
-<header>
-  <h1>Advanced Habit Tracker</h1>
-  <nav aria-label="User navigation"></nav>
-</header>
+  <header>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="progress.html">Progress</a>
+    </div>
+    <button class="logout-button" id="logout">Log Out</button>
+  </header>
+
+  <main>
+    <div class="sidebar">
+      <h2>Add Habit</h2>
+      <input id="habit-input" type="text" placeholder="Enter new habit" />
+      <button id="add-habit-button">Add Habit</button>
+    </div>
+    <div class="content">
+      <h2>Today's Habits</h2>
+      <ul id="habit-list"></ul>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      getDocs,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
+      authDomain: "habit-tracker-7c16d.firebaseapp.com",
+      projectId: "habit-tracker-7c16d",
+      storageBucket: "habit-tracker-7c16d.appspot.com",
+      messagingSenderId: "329214838371",
+      appId: "1:329214838371:web:4d50e8ddedffc72defda56",
+      measurementId: "G-22KVBFSEL5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const habitsRef = collection(db, "habits");
+
+    // Auth Check
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        renderHabits();
+      }
+    });
+
+    // Habit Logic
+    const input = document.getElementById("habit-input");
+    const list = document.getElementById("habit-list");
+
+    async function renderHabits() {
+      const snapshot = await getDocs(habitsRef);
+      list.innerHTML = "";
+      snapshot.forEach(docSnap => {
+        const habit = docSnap.data();
+        const li = document.createElement("li");
+        li.className = habit.completed ? "completed" : "";
+
+        const text = document.createElement("span");
+        text.textContent = habit.name;
+        text.onclick = () => toggleHabit(docSnap.id, habit.completed);
+
+        const del = document.createElement("button");
+        del.textContent = "Delete";
+        del.onclick = () => deleteHabit(docSnap.id);
+
+        li.appendChild(text);
+        li.appendChild(del);
+        list.appendChild(li);
+      });
+    }
+
+    async function addHabit() {
+      const name = input.value.trim();
+      if (name) {
+        await addDoc(habitsRef, { name, completed: false });
+        input.value = "";
+        renderHabits();
+      }
+    }
+
+    async function toggleHabit(id, currentStatus) {
+      await updateDoc(doc(db, "habits", id), { completed: !currentStatus });
+      renderHabits();
+    }
+
+    async function deleteHabit(id) {
+      await deleteDoc(doc(db, "habits", id));
+      renderHabits();
+    }
+
+    document.getElementById("add-habit-button").addEventListener("click", addHabit);
+
+    document.getElementById("logout").addEventListener("click", () => {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    });
+  </script>
 </body>
 </html>
