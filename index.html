@@ -1,363 +1,481 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Advanced Habit Tracker</title>
-  <style>
-    /* Reset */
-    * {
-      box-sizing: border-box;
-    }
-    body, html {
-      margin: 0;
-      height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: #f9fafb;
-      color: #222;
-      display: flex;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Advanced Habit Tracker</title>
+<link rel="manifest" href="/manifest.json" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="MyApp" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
+<style>
+  /* Reset & base styles */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9fafb;
+    color: #222;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  header {
+    background: #2563eb;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header nav a {
+    margin-left: 1.25rem;
+    font-weight: 600;
+  }
+  main {
+    display: flex;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+  .sidebar {
+    background: #1e40af;
+    color: white;
+    width: 280px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar h2 {
+    margin-top: 0;
+  }
+  .sidebar button {
+    background: #3b82f6;
+    border: none;
+    color: white;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background 0.3s ease;
+  }
+  .sidebar button:hover {
+    background: #60a5fa;
+  }
+  .content {
+    flex: 1;
+    padding: 1rem 2rem;
+    overflow-y: auto;
+  }
+  h1, h2 {
+    margin-bottom: 0.5rem;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  textarea {
+    resize: vertical;
+  }
+  label {
+    font-weight: 600;
+  }
+  .btn-primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .btn-primary:hover {
+    background: #3b82f6;
+  }
+  .habit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .habit-item {
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .habit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .habit-name {
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .habit-done-btn {
+    background: #10b981;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .habit-done-btn.done {
+    background: #6ee7b7;
+  }
+  .habit-notes {
+    margin-top: 0.75rem;
+  }
+  .journal-section {
+    margin-top: 2rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+  }
+  .journal-entry {
+    margin-bottom: 1rem;
+  }
+  .vision-section label {
+    display: block;
+  }
+  .vision-section {
+    background: white;
+    padding: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+    margin-bottom: 2rem;
+  }
+  /* Responsive */
+  @media (max-width: 720px) {
+    main {
       flex-direction: column;
-      min-height: 100vh;
+      height: auto;
     }
-
-    /* Header */
-    header {
-      background: #1f2937;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 0 1rem;
-      height: 50px;
-      user-select: none;
-      flex-shrink: 0;
-      font-weight: 600;
-    }
-    header .logo {
-      font-size: 1.2rem;
-      letter-spacing: 1px;
-      flex-grow: 1;
-    }
-    header nav a {
-      color: #d1d5db;
-      text-decoration: none;
-      margin-left: 1rem;
-      font-weight: 500;
-      transition: color 0.2s ease;
-    }
-    header nav a:hover, header nav a.active {
-      color: #60a5fa;
-    }
-
-    /* Layout */
-    #app {
-      flex: 1;
-      display: flex;
-      height: calc(100vh - 50px);
-      overflow: hidden;
-    }
-
-    /* Sidebar */
-    aside.sidebar {
-      background: #111827;
-      color: #e5e7eb;
-      width: 250px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
-    aside.sidebar h2 {
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-      border-bottom: 1px solid #374151;
-      padding-bottom: 0.5rem;
-    }
-    aside.sidebar textarea {
+    .sidebar {
       width: 100%;
-      resize: vertical;
-      min-height: 80px;
-      background: #1f2937;
-      color: #e5e7eb;
-      border: 1px solid #374151;
+      flex-direction: row;
+      overflow-x: auto;
       padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 4px;
-      font-family: inherit;
+      gap: 1rem;
     }
-    aside.sidebar small {
-      margin-top: 0.3rem;
-      color: #9ca3af;
-      font-size: 0.8rem;
-      display: block;
+    .sidebar h2 {
+      display: none;
+    }
+    .content {
+      padding: 1rem 1rem 2rem 1rem;
+    }
+    .habit-item {
+      padding: 0.75rem;
+    }
+  }
+</style>
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+  import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot, query, where, addDoc, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
+    authDomain: "habit-tracker-7c16d.firebaseapp.com",
+    projectId: "habit-tracker-7c16d",
+    storageBucket: "habit-tracker-7c16d.appspot.com",
+    messagingSenderId: "329214838371",
+    appId: "1:329214838371:web:4d50e8ddedffc72defda56",
+    measurementId: "G-22KVBFSEL5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  // Globals
+  let currentUser = null;
+
+  // DOM Elements
+  const sidebar = document.createElement("div");
+  sidebar.className = "sidebar";
+  const content = document.createElement("div");
+  content.className = "content";
+
+  // Main container to append
+  const main = document.createElement("main");
+  main.appendChild(sidebar);
+  main.appendChild(content);
+  document.body.appendChild(main);
+
+  // Clear content helper
+  function clearContent() {
+    content.innerHTML = "";
+  }
+
+  // Render login button or user info
+  function renderAuthUI(user) {
+    sidebar.innerHTML = "";
+    if (user) {
+      currentUser = user;
+      const userEmail = document.createElement("div");
+      userEmail.textContent = `Signed in as ${user.email}`;
+      userEmail.style.marginBottom = "1rem";
+      sidebar.appendChild(userEmail);
+
+      const logoutBtn = document.createElement("button");
+      logoutBtn.textContent = "Sign Out";
+      logoutBtn.onclick = () => signOut(auth);
+      sidebar.appendChild(logoutBtn);
+
+      // Load main app UI
+      loadAppUI();
+    } else {
+      currentUser = null;
+      const loginBtn = document.createElement("button");
+      loginBtn.textContent = "Sign In with Google";
+      loginBtn.onclick = () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider).catch(console.error);
+      };
+      sidebar.appendChild(loginBtn);
+      clearContent();
+    }
+  }
+
+  // Load the main app UI after login
+  async function loadAppUI() {
+    clearContent();
+
+    // Vision Section
+    const visionSection = document.createElement("section");
+    visionSection.className = "vision-section";
+    visionSection.innerHTML = `
+      <h2>Your Vision & Identity</h2>
+      <form id="vision-form">
+        <label for="fitness-goals">Fitness Goals</label>
+        <input type="text" id="fitness-goals" name="fitnessGoals" placeholder="E.g. Workout 4x a week" />
+        <label for="reading-goals">Reading/Spiritual Goals</label>
+        <input type="text" id="reading-goals" name="readingGoals" placeholder="E.g. Read Book of Mormon daily" />
+        <label for="financial-goals">Financial Goals</label>
+        <input type="text" id="financial-goals" name="financialGoals" placeholder="E.g. Track spending monthly" />
+        <label for="core-values">Core Values</label>
+        <textarea id="core-values" name="coreValues" rows="3" placeholder="E.g. Integrity, Discipline, Kindness"></textarea>
+        <label for="daily-habits-overview">Daily Habits Overview</label>
+        <textarea id="daily-habits-overview" name="dailyHabitsOverview" rows="2" placeholder="E.g. Exercise, Read, Meditate"></textarea>
+        <label for="dream-self">Dream Self Description</label>
+        <textarea id="dream-self" name="dreamSelf" rows="4" placeholder="Describe your ideal future self"></textarea>
+        <button type="submit" class="btn-primary">Save Vision</button>
+      </form>
+    `;
+    content.appendChild(visionSection);
+
+    // Load saved vision data if exists
+    const visionDocRef = doc(db, "users", currentUser.uid, "meta", "vision");
+    const visionDocSnap = await getDoc(visionDocRef);
+    if (visionDocSnap.exists()) {
+      const data = visionDocSnap.data();
+      document.getElementById("fitness-goals").value = data.fitnessGoals || "";
+      document.getElementById("reading-goals").value = data.readingGoals || "";
+      document.getElementById("financial-goals").value = data.financialGoals || "";
+      document.getElementById("core-values").value = data.coreValues || "";
+      document.getElementById("daily-habits-overview").value = data.dailyHabitsOverview || "";
+      document.getElementById("dream-self").value = data.dreamSelf || "";
     }
 
-    /* Main content */
-    main.content {
-      flex: 1;
-      background: white;
-      display: flex;
-      flex-direction: column;
-      padding: 1rem 1.5rem;
-      overflow-y: auto;
+    // Vision form save handler
+    document.getElementById("vision-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const visionData = {
+        fitnessGoals: e.target.fitnessGoals.value.trim(),
+        readingGoals: e.target.readingGoals.value.trim(),
+        financialGoals: e.target.financialGoals.value.trim(),
+        coreValues: e.target.coreValues.value.trim(),
+        dailyHabitsOverview: e.target.dailyHabitsOverview.value.trim(),
+        dreamSelf: e.target.dreamSelf.value.trim()
+      };
+      await setDoc(visionDocRef, visionData);
+      alert("Vision saved!");
+    });
+
+    // Habits Section
+    const habitsSection = document.createElement("section");
+    habitsSection.innerHTML = `<h2>Your Habits</h2><ul id="habit-list" class="habit-list"></ul><button id="add-habit-btn" class="btn-primary">Add New Habit</button>`;
+    content.appendChild(habitsSection);
+
+    // Load and render habits
+    const habitsCollection = collection(db, "users", currentUser.uid, "habits");
+
+    function formatDate(d) {
+      return d.toISOString().split("T")[0];
     }
 
-    /* Tabs navigation */
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid #e5e7eb;
-      margin-bottom: 1rem;
-      user-select: none;
-    }
-    .tabs button {
-      background: none;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      font-weight: 600;
-      color: #6b7280;
-      border-bottom: 3px solid transparent;
-      transition: border-color 0.3s ease, color 0.3s ease;
-    }
-    .tabs button.active {
-      color: #2563eb;
-      border-color: #2563eb;
-    }
-    .tabs button:hover:not(.active) {
-      color: #374151;
+    // For simplicity: only track completion for today
+    const todayStr = formatDate(new Date());
+
+    // Render habits
+    async function renderHabits() {
+      const habitList = document.getElementById("habit-list");
+      habitList.innerHTML = "";
+
+      const habitsSnap = await getDocs(habitsCollection);
+      if (habitsSnap.empty) {
+        habitList.innerHTML = "<p>No habits yet. Click 'Add New Habit' to start.</p>";
+        return;
+      }
+
+      habitsSnap.forEach(async (habitDoc) => {
+        const habit = habitDoc.data();
+        const habitId = habitDoc.id;
+
+        // Fetch today’s completion doc for this habit
+        const completionDocRef = doc(db, "users", currentUser.uid, "habits", habitId, "completions", todayStr);
+        const completionSnap = await getDoc(completionDocRef);
+        const done = completionSnap.exists() ? completionSnap.data().done : false;
+        const note = completionSnap.exists() ? completionSnap.data().note || "" : "";
+
+        // Habit item container
+        const li = document.createElement("li");
+        li.className = "habit-item";
+
+        // Header
+        const headerDiv = document.createElement("div");
+        headerDiv.className = "habit-header";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "habit-name";
+        nameSpan.textContent = habit.name;
+        headerDiv.appendChild(nameSpan);
+
+        const doneBtn = document.createElement("button");
+        doneBtn.className = "habit-done-btn";
+        doneBtn.textContent = done ? "Completed ✓" : "Mark Done";
+        if (done) doneBtn.classList.add("done");
+        doneBtn.onclick = async () => {
+          // Toggle done state
+          const newDone = !done;
+          await setDoc(completionDocRef, {
+            done: newDone,
+            note: newDone ? note : ""
+          });
+          renderHabits();
+        };
+        headerDiv.appendChild(doneBtn);
+        li.appendChild(headerDiv);
+
+        // Note input (optional)
+        if (done) {
+          const noteLabel = document.createElement("label");
+          noteLabel.textContent = "Note (optional):";
+          noteLabel.htmlFor = `note-${habitId}`;
+
+          const noteInput = document.createElement("textarea");
+          noteInput.id = `note-${habitId}`;
+          noteInput.className = "habit-notes";
+          noteInput.rows = 2;
+          noteInput.placeholder = "Add a note for today's habit completion...";
+          noteInput.value = note;
+          noteInput.onchange = async (ev) => {
+            await updateDoc(completionDocRef, { note: ev.target.value });
+          };
+
+          li.appendChild(noteLabel);
+          li.appendChild(noteInput);
+        }
+
+        habitList.appendChild(li);
+      });
     }
 
-    /* Daily Check-In List */
-    .habit-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-width: 600px;
-      width: 100%;
-    }
-    .habit-list li {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 1.1rem;
-      user-select: none;
-    }
-    .habit-list li.completed .habit-name {
-      text-decoration: line-through;
-      color: #9ca3af;
-    }
-    .habit-name {
-      flex-grow: 1;
-      cursor: pointer;
-    }
-    .habit-toggle {
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-      border: 2px solid #2563eb;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: 1rem;
-      background: white;
-      transition: background 0.2s ease, border-color 0.2s ease;
-    }
-    .habit-toggle.completed {
-      background: #2563eb;
-      border-color: #2563eb;
-    }
-    .habit-toggle svg {
-      fill: white;
-      width: 16px;
-      height: 16px;
-      display: block;
-    }
+    await renderHabits();
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      #app {
-        flex-direction: column;
-        height: auto;
+    // Add habit button handler
+    document.getElementById("add-habit-btn").onclick = () => {
+      // Pop up prompt for new habit name
+      const newHabitName = prompt("Enter new habit name:");
+      if (newHabitName && newHabitName.trim() !== "") {
+        addDoc(habitsCollection, { name: newHabitName.trim() }).then(() => renderHabits());
       }
-      aside.sidebar {
-        width: 100%;
-        padding: 1rem 0.5rem;
-        order: 2;
-        max-height: 180px;
-        overflow-y: auto;
-      }
-      main.content {
-        padding: 1rem 0.5rem;
-        order: 1;
-      }
-      .tabs {
-        flex-wrap: wrap;
-      }
-      .habit-list li {
-        font-size: 1rem;
-        padding: 0.6rem 0.8rem;
-      }
-    }
-  </style>
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
-      authDomain: "habit-tracker-7c16d.firebaseapp.com",
-      projectId: "habit-tracker-7c16d",
-      storageBucket: "habit-tracker-7c16d.appspot.com",
-      messagingSenderId: "329214838371",
-      appId: "1:329214838371:web:4d50e8ddedffc72defda56",
-      measurementId: "G-22KVBFSEL5"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const habitsRef = collection(db, "habits");
-    const futureSelfDocId = "futureSelfStatement"; // We will store one doc with this ID for simplicity
-    const futureSelfRef = doc(db, "appData", futureSelfDocId);
+    // Journaling Section
+    const journalSection = document.createElement("section");
+    journalSection.className = "journal-section";
+    journalSection.innerHTML = `
+      <h2>Journal</h2>
+      <form id="journal-form">
+        <label for="journal-date">Date</label>
+        <input type="date" id="journal-date" name="journalDate" value="${todayStr}" required />
+        <label for="journal-text">Entry</label>
+        <textarea id="journal-text" name="journalText" rows="5" placeholder="Write your thoughts here..." required></textarea>
+        <button type="submit" class="btn-primary">Save Journal Entry</button>
+      </form>
+      <div id="journal-entries"></div>
+    `;
+    content.appendChild(journalSection);
 
-    let currentTab = "daily"; // daily, dashboard, vision
+    // Load and render journal entries
+    async function renderJournalEntries() {
+      const entriesContainer = document.getElementById("journal-entries");
+      entriesContainer.innerHTML = "<h3>Previous Entries</h3>";
+      const journalCol = collection(db, "users", currentUser.uid, "journal");
+      const journalQuery = query(journalCol, orderBy("date", "desc"));
+      const journalSnap = await getDocs(journalQuery);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const tabs = document.querySelectorAll(".tabs button");
-      const dailyList = document.getElementById("daily-habit-list");
-      const futureSelfTextarea = document.getElementById("future-self-textarea");
+      if (journalSnap.empty) {
+        entriesContainer.innerHTML += "<p>No journal entries yet.</p>";
+        return;
+      }
 
-      // Switch tab UI
-      tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-          if (tab.dataset.tab === currentTab) return;
-          currentTab = tab.dataset.tab;
-          document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
-          document.getElementById(currentTab).style.display = "block";
-          tabs.forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
-          if(currentTab === "daily") renderHabits();
-          if(currentTab === "vision") loadFutureSelf();
-        });
+      journalSnap.forEach(docSnap => {
+        const entry = docSnap.data();
+        const entryDiv = document.createElement("div");
+        entryDiv.className = "journal-entry";
+        entryDiv.innerHTML = `<strong>${entry.date}</strong><p>${entry.text}</p>`;
+        entriesContainer.appendChild(entryDiv);
       });
+    }
 
-      // Initial render
-      document.getElementById(currentTab).style.display = "block";
-      document.querySelector(`.tabs button[data-tab="${currentTab}"]`).classList.add("active");
-      renderHabits();
-      loadFutureSelf();
+    await renderJournalEntries();
 
-      async function renderHabits() {
-        const snapshot = await getDocs(habitsRef);
-        dailyList.innerHTML = "";
-        snapshot.forEach(docSnap => {
-          const habit = docSnap.data();
-          const li = document.createElement("li");
-          li.className = habit.completedToday ? "completed" : "";
+    // Journal form submit
+    document.getElementById("journal-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const date = e.target.journalDate.value;
+      const text = e.target.journalText.value.trim();
 
-          const habitName = document.createElement("span");
-          habitName.textContent = habit.name;
-          habitName.className = "habit-name";
-          habitName.onclick = () => toggleHabit(docSnap.id, habit.completedToday);
-
-          const toggleBtn = document.createElement("div");
-          toggleBtn.className = "habit-toggle" + (habit.completedToday ? " completed" : "");
-          toggleBtn.title = habit.completedToday ? "Mark incomplete" : "Mark complete";
-          toggleBtn.onclick = () => toggleHabit(docSnap.id, habit.completedToday);
-          toggleBtn.innerHTML = habit.completedToday ? checkmarkSVG() : "";
-
-          li.appendChild(habitName);
-          li.appendChild(toggleBtn);
-          dailyList.appendChild(li);
-        });
+      if (!date || !text) {
+        alert("Please enter both date and journal text.");
+        return;
       }
-
-      async function toggleHabit(id, currentStatus) {
-        // Toggle completedToday
-        await updateDoc(doc(db, "habits", id), { completedToday: !currentStatus });
-        renderHabits();
-      }
-
-      async function loadFutureSelf() {
-        try {
-          const docSnap = await import("https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js").then(firestore => firestore.getDoc(futureSelfRef));
-          if(docSnap.exists()){
-            futureSelfTextarea.value = docSnap.data().text || "";
-          } else {
-            futureSelfTextarea.value = "";
-          }
-        } catch(e) {
-          futureSelfTextarea.value = "";
-          console.error("Error loading future self statement", e);
-        }
-      }
-
-      async function saveFutureSelf() {
-        const text = futureSelfTextarea.value.trim();
-        try {
-          await updateDoc(futureSelfRef, { text });
-        } catch(e) {
-          // doc might not exist yet, so create
-          await addDoc(collection(db, "appData"), { id: futureSelfDocId, text });
-        }
-      }
-
-      futureSelfTextarea.addEventListener("blur", saveFutureSelf);
-
-      // Add new habit
-      document.getElementById("add-habit-button").addEventListener("click", async () => {
-        const input = document.getElementById("habit-input");
-        const name = input.value.trim();
-        if(!name) return alert("Please enter a habit name");
-        await addDoc(habitsRef, { name, completedToday: false, createdAt: Date.now() });
-        input.value = "";
-        if(currentTab === "daily") renderHabits();
-      });
-
-      function checkmarkSVG(){
-        return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-      }
+      const journalDocRef = doc(db, "users", currentUser.uid, "journal", date);
+      await setDoc(journalDocRef, { date, text });
+      alert("Journal entry saved.");
+      e.target.journalText.value = "";
+      await renderJournalEntries();
     });
-  </script>
+  }
+
+  // Listen to auth state changes
+  onAuthStateChanged(auth, user => {
+    renderAuthUI(user);
+  });
+</script>
 </head>
 <body>
-  <header>
-    <div class="logo">Habit Tracker</div>
-    <nav>
-      <button class="tab-btn" data-tab="daily">Daily Check-In</button>
-      <button class="tab-btn" data-tab="dashboard">Dashboard</button>
-      <button class="tab-btn" data-tab="vision">Future Self</button>
-    </nav>
-  </header>
-  <div id="app">
-    <aside class="sidebar">
-      <h2>Future Self Vision</h2>
-      <textarea id="future-self-textarea" placeholder="Write your vision here..."></textarea>
-      <small>Describe your ideal self and goals. This is your motivation!</small>
-      <hr style="margin:1rem 0;">
-      <h2>Add New Habit</h2>
-      <input id="habit-input" type="text" placeholder="New habit name" autocomplete="off" />
-      <button id="add-habit-button">Add Habit</button>
-    </aside>
-    <main class="content">
-      <section id="daily" class="tab-content" style="display:none">
-        <h2>Today's Habits</h2>
-        <ul class="habit-list" id="daily-habit-list"></ul>
-      </section>
-
-      <section id="dashboard" class="tab-content" style="display:none">
-        <h2>Dashboard (Coming Soon)</h2>
-        <p>Here we will show progress bars, graphs, and calendar views.</p>
-      </section>
-
-      <section id="vision" class="tab-content" style="display:none">
-        <h2>Future Self Vision</h2>
-        <p>Use the text area on the left sidebar to write and update your vision anytime.</p>
-      </section>
-    </main>
-  </div>
+<header>
+  <h1>Advanced Habit Tracker</h1>
+  <nav aria-label="User navigation"></nav>
+</header>
 </body>
 </html>
