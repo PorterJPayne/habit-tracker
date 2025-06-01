@@ -6,12 +6,112 @@
   <title>Habit & Task Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <script type="module" src="main.js"></script>
+  <style>
+    /* Custom styles for entry cards */
+    .entry-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-left: 4px solid #3b82f6;
+      margin-bottom: 0.5rem;
+    }
+    
+    .entry-card h4 {
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .entry-card p {
+      margin: 0 0 0.75rem 0;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+    
+    .entry-card button {
+      margin-right: 0.5rem;
+      margin-bottom: 0.25rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .entry-card button:first-of-type {
+      background-color: #10b981;
+      color: white;
+    }
+    
+    .entry-card button:nth-of-type(2) {
+      background-color: #ef4444;
+      color: white;
+    }
+    
+    .entry-card button:last-of-type {
+      background-color: #6b7280;
+      color: white;
+    }
+    
+    .entry-card button:hover {
+      opacity: 0.9;
+    }
+
+    /* Modal styles */
+    .modal {
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 h-screen flex flex-col">
   <!-- Fixed Header -->
   <header class="bg-white shadow p-4 flex justify-between items-center fixed w-full top-0 z-50">
-    <h1 class="text-2xl font-bold">Welcome, <span id="user-name">User</span></h1>
-    <button id="sign-out" class="bg-red-500 text-white px-4 py-2 rounded">Sign Out</button>
+    <div class="flex items-center space-x-4">
+      <h1 class="text-2xl font-bold">Welcome, <span id="user-name">User</span></h1>
+    </div>
+    <nav class="hidden md:flex space-x-4">
+      <a href="index.html" class="text-blue-600 font-semibold">Home</a>
+      <a href="calendar.html" class="text-gray-600 hover:text-blue-600">Calendar</a>
+      <a href="exercise.html" class="text-gray-600 hover:text-blue-600">Exercise</a>
+      <a href="progress.html" class="text-gray-600 hover:text-blue-600">Progress</a>
+    </nav>
+    <button id="sign-out" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Sign Out</button>
   </header>
 
   <!-- Main Content -->
@@ -20,41 +120,93 @@
     <!-- Identity Vision Module -->
     <section class="bg-white p-4 rounded shadow">
       <h2 class="text-xl font-semibold mb-2">Your Vision</h2>
-      <p id="identity-vision" class="mb-2">Loading...</p>
-      <button id="edit-vision" class="bg-blue-500 text-white px-3 py-1 rounded">Edit Vision</button>
+      <p id="identity-vision" class="mb-2 text-gray-700 min-h-12">Loading...</p>
+      <button id="edit-vision" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit Vision</button>
     </section>
 
     <!-- Add Habit/Task Module -->
     <section class="bg-white p-4 rounded shadow">
       <h2 class="text-xl font-semibold mb-2">Add Habit or Task</h2>
-      <input id="habit-input" type="text" placeholder="Title" class="w-full p-2 border mb-2 rounded" />
-      <textarea id="habit-note" placeholder="Optional note..." class="w-full p-2 border mb-2 rounded"></textarea>
-      <select id="habit-type" class="w-full p-2 border mb-2 rounded">
+      <input id="habit-input" type="text" placeholder="Title" class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <textarea id="habit-note" placeholder="Optional note..." class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+      <select id="habit-type" class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
         <option value="habit">Habit</option>
         <option value="task">One-Time Task</option>
       </select>
-      <button id="add-habit" class="bg-green-500 text-white px-4 py-2 w-full rounded">Add</button>
+      <button id="add-habit" class="bg-green-500 text-white px-4 py-2 w-full rounded hover:bg-green-600">Add</button>
     </section>
 
     <!-- Habits List -->
     <section class="bg-white p-4 rounded shadow">
       <h2 class="text-xl font-semibold mb-2">Habits</h2>
-      <div id="habits-container" class="space-y-2"></div>
+      <div id="habits-container" class="space-y-2">
+        <p class="text-gray-500 text-sm">No habits yet. Add one above!</p>
+      </div>
     </section>
 
     <!-- Tasks List -->
     <section class="bg-white p-4 rounded shadow">
       <h2 class="text-xl font-semibold mb-2">One-Time Tasks</h2>
-      <div id="tasks-container" class="space-y-2"></div>
+      <div id="tasks-container" class="space-y-2">
+        <p class="text-gray-500 text-sm">No tasks yet. Add one above!</p>
+      </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="bg-white p-4 rounded shadow">
+      <h2 class="text-xl font-semibold mb-2">Today's Progress</h2>
+      <div id="stats-container">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-gray-600">Habits Completed:</span>
+          <span id="habits-completed" class="font-bold text-green-600">0</span>
+        </div>
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-gray-600">Tasks Completed:</span>
+          <span id="tasks-completed" class="font-bold text-blue-600">0</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: 0%"></div>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">Keep going! You're doing great!</p>
+      </div>
     </section>
 
     <!-- Journal Section -->
     <section class="bg-white p-4 rounded shadow col-span-full">
-      <h2 class="text-xl font-semibold mb-2">Journal</h2>
-      <textarea id="journal-entry" rows="6" placeholder="Write your thoughts..." class="w-full p-2 border rounded"></textarea>
-      <button id="save-journal" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Save Journal</button>
+      <h2 class="text-xl font-semibold mb-2">Daily Journal</h2>
+      <textarea id="journal-entry" rows="6" placeholder="Write your thoughts, reflections, or notes for today..." class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      <div class="flex justify-between items-center mt-2">
+        <button id="save-journal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Journal</button>
+        <span class="text-sm text-gray-500" id="journal-status"></span>
+      </div>
     </section>
 
   </main>
+
+  <!-- Modal for Entry Details -->
+  <div id="entry-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <button id="close-modal" class="close-btn">&times;</button>
+      <div id="modal-content">
+        <!-- Content will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2">
+    <a href="index.html" class="flex flex-col items-center text-blue-600">
+      <span class="text-xs">Home</span>
+    </a>
+    <a href="calendar.html" class="flex flex-col items-center text-gray-600">
+      <span class="text-xs">Calendar</span>
+    </a>
+    <a href="exercise.html" class="flex flex-col items-center text-gray-600">
+      <span class="text-xs">Exercise</span>
+    </a>
+    <a href="progress.html" class="flex flex-col items-center text-gray-600">
+      <span class="text-xs">Progress</span>
+    </a>
+  </nav>
 </body>
 </html>
