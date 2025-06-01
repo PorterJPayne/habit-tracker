@@ -437,7 +437,45 @@
       color: #3b82f6;
     }
 
-    /* Responsive adjustments */
+    /* Calendar styles */
+    .calendar-day {
+      transition: all 0.2s ease;
+    }
+    
+    .calendar-day:hover {
+      transform: scale(1.05);
+    }
+    
+    /* Exercise entry styles */
+    .exercise-entry {
+      background: white;
+      border-left: 4px solid #10b981;
+      transition: all 0.2s ease;
+    }
+    
+    .exercise-entry:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Analytics chart styles */
+    .chart-bar {
+      transition: all 0.3s ease;
+    }
+    
+    .chart-bar:hover {
+      opacity: 0.8;
+    }
+    
+    /* Insight cards */
+    .insight-card {
+      border-left: 4px solid currentColor;
+      transition: all 0.2s ease;
+    }
+    
+    .insight-card:hover {
+      transform: translateY(-1px);
+    }
     @media (max-width: 768px) {
       .compact-entry {
         padding: 0.5rem;
@@ -485,6 +523,8 @@
           <a href="#" class="nav-tab active" data-page="home">Dashboard</a>
           <a href="#" class="nav-tab" data-page="habits">All Habits</a>
           <a href="#" class="nav-tab" data-page="tasks">All Tasks</a>
+          <a href="#" class="nav-tab" data-page="calendar">Calendar</a>
+          <a href="#" class="nav-tab" data-page="exercise">Exercise</a>
           <a href="#" class="nav-tab" data-page="analytics">Analytics</a>
           <a href="#" class="nav-tab" data-page="journal">Journal</a>
         </nav>
@@ -600,18 +640,166 @@
       </div>
     </div>
 
+    <!-- Calendar Page -->
+    <div id="calendar-page" class="page-section">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Habit Calendar</h2>
+          <div class="flex gap-2">
+            <button id="prev-month" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">←</button>
+            <span id="current-month" class="px-4 py-1 font-semibold"></span>
+            <button id="next-month" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">→</button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-7 gap-2 mb-4">
+          <div class="text-center font-semibold text-gray-600 py-2">Sun</div>
+          <div class="text-center font-semibold text-gray-600 py-2">Mon</div>
+          <div class="text-center font-semibold text-gray-600 py-2">Tue</div>
+          <div class="text-center font-semibold text-gray-600 py-2">Wed</div>
+          <div class="text-center font-semibold text-gray-600 py-2">Thu</div>
+          <div class="text-center font-semibold text-gray-600 py-2">Fri</div>
+          <div class="text-center font-semibold text-gray-600 py-2">Sat</div>
+        </div>
+        
+        <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+          <!-- Calendar days will be populated by JavaScript -->
+        </div>
+        
+        <div class="mt-6 flex gap-4 text-sm">
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-green-200 rounded"></div>
+            <span>Completed habits</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-red-200 rounded"></div>
+            <span>Missed habits</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-blue-200 rounded"></div>
+            <span>Today</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exercise Page -->
+    <div id="exercise-page" class="page-section">
+      <div class="space-y-6">
+        <!-- Quick Exercise Log -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-bold mb-4">Log Workout</h2>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2">Exercise Type</label>
+              <select id="exercise-type" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="cardio">Cardio</option>
+                <option value="strength">Strength Training</option>
+                <option value="yoga">Yoga</option>
+                <option value="sports">Sports</option>
+                <option value="walking">Walking</option>
+                <option value="running">Running</option>
+                <option value="cycling">Cycling</option>
+                <option value="swimming">Swimming</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Duration (minutes)</label>
+              <input id="exercise-duration" type="number" placeholder="30" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium mb-2">Notes (optional)</label>
+              <textarea id="exercise-notes" placeholder="How did it go? Any observations..." class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <button id="log-exercise" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition-colors">Log Exercise</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise History -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-bold mb-4">Recent Workouts</h2>
+          <div id="exercise-history" class="space-y-3">
+            <p class="text-gray-500 text-center py-8">No workouts logged yet. Start by logging your first exercise above!</p>
+          </div>
+        </div>
+
+        <!-- Exercise Stats -->
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+            <div class="text-2xl font-bold text-green-600" id="total-workouts">0</div>
+            <div class="text-sm text-gray-600">Total Workouts</div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+            <div class="text-2xl font-bold text-blue-600" id="total-minutes">0</div>
+            <div class="text-sm text-gray-600">Total Minutes</div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+            <div class="text-2xl font-bold text-purple-600" id="avg-per-week">0</div>
+            <div class="text-sm text-gray-600">Avg per Week</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Analytics Page -->
     <div id="analytics-page" class="page-section">
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 class="text-2xl font-bold mb-6">Analytics</h2>
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="p-4 bg-gray-50 rounded">
-            <h3 class="font-semibold mb-2">Completion Trends</h3>
-            <p class="text-sm text-gray-600">Charts and analytics coming soon</p>
+      <div class="space-y-6">
+        <!-- Progress Overview -->
+        <div class="grid md:grid-cols-4 gap-4">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+            <div class="text-2xl font-bold text-green-600" id="total-habits">0</div>
+            <div class="text-sm text-gray-600">Total Habits</div>
           </div>
-          <div class="p-4 bg-gray-50 rounded">
-            <h3 class="font-semibold mb-2">Streak Analysis</h3>
-            <p class="text-sm text-gray-600">Streak tracking and insights coming soon</p>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+            <div class="text-2xl font-bold text-blue-600" id="total-tasks">0</div>
+            <div class="text-sm text-gray-600">Total Tasks</div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+            <div class="text-2xl font-bold text-purple-600" id="longest-streak">0</div>
+            <div class="text-sm text-gray-600">Longest Streak</div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+            <div class="text-2xl font-bold text-orange-600" id="avg-completion">0%</div>
+            <div class="text-sm text-gray-600">Avg Completion</div>
+          </div>
+        </div>
+
+        <!-- Habit Performance -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-bold mb-4">Habit Performance</h2>
+          <div id="habit-performance" class="space-y-3">
+            <p class="text-gray-500 text-center py-8">No habits to analyze yet.</p>
+          </div>
+        </div>
+
+        <!-- Weekly Progress Chart -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-bold mb-4">Weekly Progress</h2>
+          <div class="grid grid-cols-7 gap-2 mb-4">
+            <div class="text-center text-sm font-medium text-gray-600">Sun</div>
+            <div class="text-center text-sm font-medium text-gray-600">Mon</div>
+            <div class="text-center text-sm font-medium text-gray-600">Tue</div>
+            <div class="text-center text-sm font-medium text-gray-600">Wed</div>
+            <div class="text-center text-sm font-medium text-gray-600">Thu</div>
+            <div class="text-center text-sm font-medium text-gray-600">Fri</div>
+            <div class="text-center text-sm font-medium text-gray-600">Sat</div>
+          </div>
+          <div id="weekly-chart" class="grid grid-cols-7 gap-2">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Insights -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-bold mb-4">Insights</h2>
+          <div id="insights-content" class="space-y-4">
+            <div class="p-4 bg-blue-50 rounded-lg">
+              <h3 class="font-semibold text-blue-900">🎯 Keep Building!</h3>
+              <p class="text-blue-800 text-sm mt-1">Track your habits consistently to see patterns and insights here.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -652,11 +840,14 @@
     <a href="#" class="flex flex-col items-center nav-tab" data-page="tasks">
       <span class="text-xs">Tasks</span>
     </a>
+    <a href="#" class="flex flex-col items-center nav-tab" data-page="calendar">
+      <span class="text-xs">Calendar</span>
+    </a>
+    <a href="#" class="flex flex-col items-center nav-tab" data-page="exercise">
+      <span class="text-xs">Exercise</span>
+    </a>
     <a href="#" class="flex flex-col items-center nav-tab" data-page="analytics">
       <span class="text-xs">Analytics</span>
-    </a>
-    <a href="#" class="flex flex-col items-center nav-tab" data-page="journal">
-      <span class="text-xs">Journal</span>
     </a>
   </nav>
 
@@ -736,6 +927,8 @@
 
     let currentUser = null;
     let allEntries = [];
+    let exercises = [];
+    let currentCalendarDate = new Date();
 
     // Google Sign In
     googleSignInBtn.addEventListener('click', async () => {
@@ -819,6 +1012,9 @@
       // Load specific page content
       if (pageId === 'habits') loadAllHabits();
       if (pageId === 'tasks') loadAllTasks();
+      if (pageId === 'calendar') loadCalendar();
+      if (pageId === 'exercise') loadExercises();
+      if (pageId === 'analytics') loadAnalytics();
       if (pageId === 'journal') loadTodayJournal();
     }
 
@@ -909,7 +1105,50 @@
       }
     });
 
-    // Load user data
+    // Exercise logging
+    document.getElementById('log-exercise')?.addEventListener('click', async () => {
+      if (!currentUser) return;
+      
+      const type = document.getElementById('exercise-type').value;
+      const duration = parseInt(document.getElementById('exercise-duration').value);
+      const notes = document.getElementById('exercise-notes').value.trim();
+      
+      if (!duration || duration <= 0) {
+        alert('Please enter a valid duration');
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, 'users', currentUser.uid, 'exercises'), {
+          type,
+          duration,
+          notes,
+          date: new Date().toISOString().split('T')[0],
+          timestamp: Timestamp.now()
+        });
+        
+        // Clear form
+        document.getElementById('exercise-duration').value = '';
+        document.getElementById('exercise-notes').value = '';
+        
+        await loadExercises();
+        alert('Exercise logged successfully!');
+      } catch (error) {
+        console.error('Error logging exercise:', error);
+        alert('Failed to log exercise. Please try again.');
+      }
+    });
+
+    // Calendar navigation
+    document.getElementById('prev-month')?.addEventListener('click', () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+      loadCalendar();
+    });
+
+    document.getElementById('next-month')?.addEventListener('click', () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+      loadCalendar();
+    });
     async function loadUserData() {
       if (!currentUser) return;
       
@@ -928,9 +1167,263 @@
         }
         
         await loadEntries();
+        await loadExercises();
       } catch (error) {
         console.error('Error loading user data:', error);
       }
+    }
+
+    // Load exercises
+    async function loadExercises() {
+      if (!currentUser) return;
+      
+      try {
+        const snapshot = await getDocs(collection(db, 'users', currentUser.uid, 'exercises'));
+        exercises = [];
+        
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          exercises.push({ id: docSnap.id, ...data });
+        });
+        
+        // Sort by timestamp, most recent first
+        exercises.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
+        
+        updateExerciseStats();
+      } catch (error) {
+        console.error('Error loading exercises:', error);
+      }
+    }
+
+    // Update exercise stats and history
+    function updateExerciseStats() {
+      const totalWorkouts = exercises.length;
+      const totalMinutes = exercises.reduce((sum, ex) => sum + (ex.duration || 0), 0);
+      
+      // Calculate average per week (rough estimate)
+      const weeksActive = Math.max(1, Math.ceil(totalWorkouts / 4));
+      const avgPerWeek = Math.round(totalWorkouts / weeksActive);
+      
+      document.getElementById('total-workouts').textContent = totalWorkouts;
+      document.getElementById('total-minutes').textContent = totalMinutes;
+      document.getElementById('avg-per-week').textContent = avgPerWeek;
+      
+      // Update exercise history
+      const historyContainer = document.getElementById('exercise-history');
+      if (exercises.length === 0) {
+        historyContainer.innerHTML = '<p class="text-gray-500 text-center py-8">No workouts logged yet. Start by logging your first exercise above!</p>';
+        return;
+      }
+      
+      historyContainer.innerHTML = exercises.slice(0, 10).map(exercise => `
+        <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+          <div>
+            <div class="font-medium capitalize">${exercise.type}</div>
+            <div class="text-sm text-gray-600">${exercise.duration} minutes • ${exercise.date}</div>
+            ${exercise.notes ? `<div class="text-sm text-gray-500 mt-1">${exercise.notes}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Load calendar
+    function loadCalendar() {
+      const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"];
+      
+      const currentMonth = currentCalendarDate.getMonth();
+      const currentYear = currentCalendarDate.getFullYear();
+      
+      document.getElementById('current-month').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      
+      // Get first day of month and number of days
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      
+      const calendarGrid = document.getElementById('calendar-grid');
+      calendarGrid.innerHTML = '';
+      
+      // Add empty cells for days before the first day of month
+      for (let i = 0; i < firstDay; i++) {
+        calendarGrid.innerHTML += '<div class="h-12"></div>';
+      }
+      
+      // Add days of the month
+      const today = new Date();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(currentYear, currentMonth, day);
+        const dateString = date.toISOString().split('T')[0];
+        const isToday = date.toDateString() === today.toDateString();
+        
+        // Check habit completion for this date
+        const dayHabits = allEntries.filter(entry => entry.type === 'habit');
+        const completedOnDay = dayHabits.filter(habit => 
+          habit.history && habit.history.some(h => h.toDate().toDateString() === date.toDateString())
+        ).length;
+        
+        let bgColor = 'bg-gray-100';
+        if (isToday) bgColor = 'bg-blue-200';
+        else if (completedOnDay > 0) bgColor = 'bg-green-200';
+        else if (date < today && dayHabits.length > 0) bgColor = 'bg-red-100';
+        
+        calendarGrid.innerHTML += `
+          <div class="h-12 ${bgColor} rounded flex items-center justify-center text-sm font-medium relative">
+            ${day}
+            ${completedOnDay > 0 ? `<div class="absolute bottom-0 right-0 bg-green-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">${completedOnDay}</div>` : ''}
+          </div>
+        `;
+      }
+    }
+
+    // Load analytics
+    function loadAnalytics() {
+      const habits = allEntries.filter(e => e.type === 'habit');
+      const tasks = allEntries.filter(e => e.type === 'task');
+      
+      // Update top stats
+      document.getElementById('total-habits').textContent = habits.length;
+      document.getElementById('total-tasks').textContent = tasks.length;
+      
+      const longestStreak = allEntries.reduce((max, entry) => Math.max(max, entry.streak || 0), 0);
+      document.getElementById('longest-streak').textContent = longestStreak;
+      
+      const totalEntries = allEntries.length;
+      const completedEntries = allEntries.filter(e => e.completed).length;
+      const avgCompletion = totalEntries > 0 ? Math.round((completedEntries / totalEntries) * 100) : 0;
+      document.getElementById('avg-completion').textContent = avgCompletion + '%';
+      
+      // Habit performance
+      const performanceContainer = document.getElementById('habit-performance');
+      if (habits.length === 0) {
+        performanceContainer.innerHTML = '<p class="text-gray-500 text-center py-8">No habits to analyze yet.</p>';
+        return;
+      }
+      
+      performanceContainer.innerHTML = habits.map(habit => {
+        const completionRate = habit.history ? 
+          Math.round((habit.history.length / Math.max(1, Math.ceil((new Date() - habit.createdAt.toDate()) / (1000 * 60 * 60 * 24)))) * 100) : 0;
+        
+        return `
+          <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+            <div>
+              <div class="font-medium">${habit.name}</div>
+              <div class="text-sm text-gray-600">Current streak: ${habit.streak || 0} days</div>
+            </div>
+            <div class="text-right">
+              <div class="font-bold text-lg">${completionRate}%</div>
+              <div class="text-sm text-gray-600">completion rate</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Weekly chart (simple version)
+      const weeklyChart = document.getElementById('weekly-chart');
+      const today = new Date();
+      const weekDays = [];
+      
+      for (let i = 6; i >= 0; i--) {
+        const day = new Date(today);
+        day.setDate(day.getDate() - i);
+        weekDays.push(day);
+      }
+      
+      weeklyChart.innerHTML = weekDays.map(day => {
+        const completedToday = allEntries.filter(entry => 
+          entry.completed && entry.history && 
+          entry.history.some(h => h.toDate().toDateString() === day.toDateString())
+        ).length;
+        
+        const totalForDay = allEntries.length;
+        const percentage = totalForDay > 0 ? (completedToday / totalForDay) * 100 : 0;
+        
+        return `
+          <div class="text-center">
+            <div class="h-16 bg-gray-200 rounded mb-1 relative overflow-hidden">
+              <div class="absolute bottom-0 left-0 right-0 bg-green-400 transition-all duration-300" 
+                   style="height: ${percentage}%"></div>
+              <div class="absolute inset-0 flex items-center justify-center text-xs font-bold">
+                ${completedToday}
+              </div>
+            </div>
+            <div class="text-xs text-gray-600">${day.getDate()}</div>
+          </div>
+        `;
+      }).join('');
+      
+      // Generate insights
+      generateInsights();
+    }
+
+    // Generate insights
+    function generateInsights() {
+      const insights = [];
+      const habits = allEntries.filter(e => e.type === 'habit');
+      
+      if (habits.length > 0) {
+        const bestHabit = habits.reduce((best, current) => 
+          (current.streak || 0) > (best.streak || 0) ? current : best
+        );
+        
+        if (bestHabit.streak > 0) {
+          insights.push({
+            icon: '🔥',
+            title: 'Streak Champion!',
+            text: `Your best habit "${bestHabit.name}" has a ${bestHabit.streak}-day streak. Keep it going!`,
+            color: 'orange'
+          });
+        }
+        
+        const completionRates = habits.map(h => ({
+          name: h.name,
+          rate: h.history ? h.history.length / Math.max(1, Math.ceil((new Date() - h.createdAt.toDate()) / (1000 * 60 * 60 * 24))) : 0
+        }));
+        
+        const strugglingHabit = completionRates.find(h => h.rate < 0.3);
+        if (strugglingHabit) {
+          insights.push({
+            icon: '💪',
+            title: 'Room for Improvement',
+            text: `"${strugglingHabit.name}" could use some attention. Try starting with smaller, easier steps.`,
+            color: 'blue'
+          });
+        }
+      }
+      
+      if (exercises.length > 0) {
+        const recentWorkouts = exercises.filter(ex => {
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return ex.timestamp.toDate() >= weekAgo;
+        }).length;
+        
+        if (recentWorkouts >= 3) {
+          insights.push({
+            icon: '💪',
+            title: 'Fitness Warrior!',
+            text: `You've logged ${recentWorkouts} workouts this week. Your consistency is paying off!`,
+            color: 'green'
+          });
+        }
+      }
+      
+      const insightsContainer = document.getElementById('insights-content');
+      if (insights.length === 0) {
+        insightsContainer.innerHTML = `
+          <div class="p-4 bg-blue-50 rounded-lg">
+            <h3 class="font-semibold text-blue-900">🎯 Keep Building!</h3>
+            <p class="text-blue-800 text-sm mt-1">Track your habits consistently to see patterns and insights here.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      insightsContainer.innerHTML = insights.map(insight => `
+        <div class="p-4 bg-${insight.color}-50 rounded-lg">
+          <h3 class="font-semibold text-${insight.color}-900">${insight.icon} ${insight.title}</h3>
+          <p class="text-${insight.color}-800 text-sm mt-1">${insight.text}</p>
+        </div>
+      `).join('');
     }
 
     // Load entries
@@ -1141,6 +1634,7 @@
         const activePage = document.querySelector('.nav-tab.active').dataset.page;
         if (activePage === 'habits') loadAllHabits();
         if (activePage === 'tasks') loadAllTasks();
+        if (activePage === 'analytics') loadAnalytics();
       } catch (error) {
         console.error('Error deleting entry:', error);
         alert('Failed to delete entry. Please try again.');
@@ -1185,6 +1679,8 @@
         const activePage = document.querySelector('.nav-tab.active').dataset.page;
         if (activePage === 'habits') loadAllHabits();
         if (activePage === 'tasks') loadAllTasks();
+        if (activePage === 'analytics') loadAnalytics();
+        if (activePage === 'calendar') loadCalendar();
       } catch (error) {
         console.error('Error toggling completion:', error);
         alert('Failed to update entry. Please try again.');
