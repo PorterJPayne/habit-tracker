@@ -3,153 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Future Self Habit Tracker</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <script type="module" src="main.js" defer></script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      background: #f0f2f5;
-      color: #333;
-    }
-
-    header {
-      background: #4a90e2;
-      color: white;
-      padding: 1em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 1.5em;
-    }
-
-    header button {
-      background: #fff;
-      color: #4a90e2;
-      border: none;
-      padding: 0.5em 1em;
-      border-radius: 5px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2em;
-      padding: 2em;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    section {
-      background: white;
-      padding: 1.5em;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    h2 {
-      margin-top: 0;
-      font-size: 1.2em;
-    }
-
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 0.75em;
-      margin: 0.5em 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1em;
-    }
-
-    button {
-      background: #4a90e2;
-      color: white;
-      border: none;
-      padding: 0.75em 1em;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1em;
-      margin-top: 0.5em;
-    }
-
-    ul#habit-list {
-      list-style: none;
-      padding: 0;
-    }
-
-    ul#habit-list li {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      padding: 1em;
-      border-radius: 6px;
-      margin-bottom: 0.75em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    canvas {
-      max-width: 100%;
-    }
-
-    @media (max-width: 600px) {
-      main {
-        padding: 1em;
-      }
-
-      header h1 {
-        font-size: 1.2em;
-      }
-    }
-  </style>
+  <title>Habit & Task Tracker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script type="module" src="main.js"></script>
 </head>
-<body>
-  <header>
-    <h1>My Future Self</h1>
-    <button id="sign-out">Sign Out</button>
+<body class="bg-gray-100 h-screen flex flex-col">
+  <!-- Fixed Header -->
+  <header class="bg-white shadow p-4 flex justify-between items-center fixed w-full top-0 z-50">
+    <h1 class="text-2xl font-bold">Welcome, <span id="user-name">User</span></h1>
+    <button id="sign-out" class="bg-red-500 text-white px-4 py-2 rounded">Sign Out</button>
   </header>
 
-  <main>
-    <section class="summary">
-      <h2>Welcome, <span id="user-name"></span></h2>
-      <p><strong>Vision:</strong> <span id="identity-vision">[Your future self vision here]</span></p>
-      <button id="edit-vision">Edit Vision</button>
+  <!-- Main Content -->
+  <main class="flex-1 pt-20 p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto">
+
+    <!-- Identity Vision Module -->
+    <section class="bg-white p-4 rounded shadow">
+      <h2 class="text-xl font-semibold mb-2">Your Vision</h2>
+      <p id="identity-vision" class="mb-2">Loading...</p>
+      <button id="edit-vision" class="bg-blue-500 text-white px-3 py-1 rounded">Edit Vision</button>
     </section>
 
-    <section class="habit-entry">
-      <h2>Add New Habit</h2>
-      <input id="habit-input" type="text" placeholder="New Habit" />
-      <textarea id="habit-note" placeholder="Optional note for this habit..."></textarea>
-      <button id="add-habit">Add Habit</button>
+    <!-- Add Habit/Task Module -->
+    <section class="bg-white p-4 rounded shadow">
+      <h2 class="text-xl font-semibold mb-2">Add Habit or Task</h2>
+      <input id="habit-input" type="text" placeholder="Title" class="w-full p-2 border mb-2 rounded" />
+      <textarea id="habit-note" placeholder="Optional note..." class="w-full p-2 border mb-2 rounded"></textarea>
+      <select id="habit-type" class="w-full p-2 border mb-2 rounded">
+        <option value="habit">Habit</option>
+        <option value="task">One-Time Task</option>
+      </select>
+      <button id="add-habit" class="bg-green-500 text-white px-4 py-2 w-full rounded">Add</button>
     </section>
 
-    <section class="habits-list">
-      <h2>Today's Habits</h2>
-      <ul id="habit-list"></ul>
+    <!-- Habits List -->
+    <section class="bg-white p-4 rounded shadow">
+      <h2 class="text-xl font-semibold mb-2">Habits</h2>
+      <div id="habits-container" class="space-y-2"></div>
     </section>
 
-    <section class="journal">
-      <h2>Daily Journal</h2>
-      <textarea id="journal-entry" rows="6" placeholder="Reflect on your day..."></textarea>
-      <button id="save-journal">Save Entry</button>
+    <!-- Tasks List -->
+    <section class="bg-white p-4 rounded shadow">
+      <h2 class="text-xl font-semibold mb-2">One-Time Tasks</h2>
+      <div id="tasks-container" class="space-y-2"></div>
     </section>
 
-    <section class="progress">
-      <h2>Progress Overview</h2>
-      <canvas id="habit-chart" width="400" height="200"></canvas>
+    <!-- Journal Section -->
+    <section class="bg-white p-4 rounded shadow col-span-full">
+      <h2 class="text-xl font-semibold mb-2">Journal</h2>
+      <textarea id="journal-entry" rows="6" placeholder="Write your thoughts..." class="w-full p-2 border rounded"></textarea>
+      <button id="save-journal" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Save Journal</button>
     </section>
+
   </main>
 </body>
 </html>
