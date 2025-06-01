@@ -1,4 +1,5 @@
-// main.js
+// Updated main.js logic to separate habits and one-time tasks
+
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js';
 import {
   getAuth,
@@ -13,14 +14,13 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   collection,
   addDoc,
   getDocs,
-  deleteDoc,
   Timestamp
 } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js';
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
   authDomain: "habit-tracker-7c16d.firebaseapp.com",
@@ -30,22 +30,19 @@ const firebaseConfig = {
   appId: "1:329214838371:web:4d50e8ddedffc72defda56"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// DOM elements
 const userNameSpan = document.getElementById('user-name');
 const visionSpan = document.getElementById('identity-vision');
 const editVisionBtn = document.getElementById('edit-vision');
 const habitInput = document.getElementById('habit-input');
 const habitNote = document.getElementById('habit-note');
+const habitType = document.getElementById('habit-type');
 const addHabitBtn = document.getElementById('add-habit');
-const habitList = document.getElementById('habit-list');
-const journalEntry = document.getElementById('journal-entry');
-const saveJournalBtn = document.getElementById('save-journal');
-const signOutBtn = document.getElementById('sign-out');
+const habitsContainer = document.getElementById('habits-container');
+const tasksContainer = document.getElementById('tasks-container');
 
 let currentUser = null;
 
@@ -68,9 +65,7 @@ async function signIn() {
   }
 }
 
-signOutBtn?.addEventListener('click', () => {
-  signOut(auth);
-});
+document.getElementById('sign-out')?.addEventListener('click', () => signOut(auth));
 
 editVisionBtn?.addEventListener('click', async () => {
   const newVision = prompt('What is your updated vision?');
@@ -83,28 +78,20 @@ editVisionBtn?.addEventListener('click', async () => {
 addHabitBtn?.addEventListener('click', async () => {
   const name = habitInput.value.trim();
   const note = habitNote.value.trim();
+  const type = habitType.value;
   if (!name || !currentUser) return;
 
-  await addDoc(collection(db, 'users', currentUser.uid, 'habits'), {
+  await addDoc(collection(db, 'users', currentUser.uid, 'entries'), {
     name,
     note,
+    type,
     completed: false,
-    date: Timestamp.now()
+    createdAt: Timestamp.now(),
+    history: []
   });
   habitInput.value = '';
   habitNote.value = '';
-  await loadHabits();
-});
-
-saveJournalBtn?.addEventListener('click', async () => {
-  if (!currentUser) return;
-  const content = journalEntry.value.trim();
-  if (!content) return;
-  await setDoc(doc(db, 'users', currentUser.uid, 'journal', new Date().toDateString()), {
-    content,
-    timestamp: Timestamp.now()
-  });
-  journalEntry.value = '';
+  await loadEntries();
 });
 
 async function loadUserData() {
@@ -115,37 +102,48 @@ async function loadUserData() {
     await setDoc(userDocRef, { vision: '[Your future self vision here]' });
   }
   visionSpan.textContent = (await getDoc(userDocRef)).data().vision;
-  await loadHabits();
+  await loadEntries();
 }
 
-async function loadHabits() {
+async function loadEntries() {
   if (!currentUser) return;
-  const habitsSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'habits'));
-  habitList.innerHTML = '';
-  habitsSnapshot.forEach(docSnap => {
+  const snapshot = await getDocs(collection(db, 'users', currentUser.uid, 'entries'));
+  habitsContainer.innerHTML = '';
+  tasksContainer.innerHTML = '';
+
+  snapshot.forEach(docSnap => {
     const data = docSnap.data();
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <span>${data.name}</span>
-      <button data-id="${docSnap.id}" class="delete-btn">Delete</button>
+    const el = document.createElement('div');
+    el.className = 'entry-card';
+    el.innerHTML = `
+      <h4>${data.name}</h4>
+      <p>${data.note}</p>
+      <button onclick="toggleComplete('${docSnap.id}')">${data.completed ? 'Undo' : 'Complete'}</button>
+      <button onclick="deleteEntry('${docSnap.id}')">Delete</button>
     `;
-    habitList.appendChild(li);
-  });
 
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const id = e.target.dataset.id;
-      await deleteDoc(doc(db, 'users', currentUser.uid, 'habits', id));
-      await loadHabits();
-    });
-  });
-}
-
-// Ensure sign-in on load
-window.addEventListener('load', () => {
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      signIn();
+    if (data.type === 'habit') {
+      habitsContainer.appendChild(el);
+    } else {
+      tasksContainer.appendChild(el);
     }
   });
-});
+}
+
+window.deleteEntry = async function (id) {
+  if (!currentUser) return;
+  await deleteDoc(doc(db, 'users', currentUser.uid, 'entries', id));
+  await loadEntries();
+};
+
+window.toggleComplete = async function (id) {
+  if (!currentUser) return;
+  const ref = doc(db, 'users', currentUser.uid, 'entries', id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+  const entry = snap.data();
+  const updated = !entry.completed;
+  const history = updated ? [...entry.history, Timestamp.now()] : entry.history.slice(0, -1);
+  await updateDoc(ref, { completed: updated, history });
+  await loadEntries();
+};
