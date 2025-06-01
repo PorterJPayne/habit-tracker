@@ -43,6 +43,11 @@ const habitType = document.getElementById('habit-type');
 const addHabitBtn = document.getElementById('add-habit');
 const habitsContainer = document.getElementById('habits-container');
 const tasksContainer = document.getElementById('tasks-container');
+const journalInput = document.getElementById('journal-entry');
+const journalBtn = document.getElementById('save-journal');
+const modal = document.getElementById('entry-modal');
+const modalContent = document.getElementById('modal-content');
+const closeModalBtn = document.getElementById('close-modal');
 
 let currentUser = null;
 
@@ -94,6 +99,18 @@ addHabitBtn?.addEventListener('click', async () => {
   await loadEntries();
 });
 
+journalBtn?.addEventListener('click', async () => {
+  if (!currentUser || !journalInput.value.trim()) return;
+  const today = new Date().toISOString().split('T')[0];
+  await setDoc(doc(db, 'users', currentUser.uid, 'journal', today), {
+    content: journalInput.value.trim(),
+    date: today,
+    timestamp: Timestamp.now()
+  });
+  alert('Journal saved!');
+  journalInput.value = '';
+});
+
 async function loadUserData() {
   if (!currentUser) return;
   const userDocRef = doc(db, 'users', currentUser.uid);
@@ -120,6 +137,7 @@ async function loadEntries() {
       <p>${data.note}</p>
       <button onclick="toggleComplete('${docSnap.id}')">${data.completed ? 'Undo' : 'Complete'}</button>
       <button onclick="deleteEntry('${docSnap.id}')">Delete</button>
+      <button onclick="showDetails('${docSnap.id}')">Details</button>
     `;
 
     if (data.type === 'habit') {
@@ -147,3 +165,27 @@ window.toggleComplete = async function (id) {
   await updateDoc(ref, { completed: updated, history });
   await loadEntries();
 };
+
+window.showDetails = async function (id) {
+  if (!currentUser) return;
+  const ref = doc(db, 'users', currentUser.uid, 'entries', id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+  const entry = snap.data();
+
+  modalContent.innerHTML = `
+    <h3>${entry.name}</h3>
+    <p><strong>Note:</strong> ${entry.note}</p>
+    <p><strong>Type:</strong> ${entry.type}</p>
+    <p><strong>Created:</strong> ${entry.createdAt.toDate().toLocaleString()}</p>
+    <p><strong>Times Completed:</strong> ${entry.history.length}</p>
+    <ul>
+      ${entry.history.map(ts => `<li>${ts.toDate().toLocaleString()}</li>`).join('')}
+    </ul>
+  `;
+  modal.style.display = 'block';
+};
+
+closeModalBtn?.addEventListener('click', () => {
+  modal.style.display = 'none';
+});
