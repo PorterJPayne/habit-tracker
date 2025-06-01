@@ -16,6 +16,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  deleteDoc,
   Timestamp
 } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js';
 
@@ -126,14 +127,25 @@ async function loadHabits() {
     const li = document.createElement('li');
     li.innerHTML = `
       <span>${data.name}</span>
-      <button onclick="deleteHabit('${docSnap.id}')">Delete</button>
+      <button data-id="${docSnap.id}" class="delete-btn">Delete</button>
     `;
     habitList.appendChild(li);
   });
+
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const id = e.target.dataset.id;
+      await deleteDoc(doc(db, 'users', currentUser.uid, 'habits', id));
+      await loadHabits();
+    });
+  });
 }
 
-window.deleteHabit = async function (id) {
-  if (!currentUser) return;
-  await setDoc(doc(db, 'users', currentUser.uid, 'habits', id), null);
-  await loadHabits();
-};
+// Ensure sign-in on load
+window.addEventListener('load', () => {
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      signIn();
+    }
+  });
+});
