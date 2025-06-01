@@ -5,16 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Habit & Task Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <script type="module" src="main.js"></script>
   <style>
     /* Custom styles for entry cards */
     .entry-card {
       background: white;
       padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       border-left: 4px solid #3b82f6;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .entry-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .entry-card.completed {
+      background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+      border-left-color: #10b981;
     }
     
     .entry-card h4 {
@@ -23,40 +34,126 @@
       color: #1f2937;
     }
     
+    .entry-card.completed h4 {
+      color: #059669;
+    }
+    
     .entry-card p {
       margin: 0 0 0.75rem 0;
       color: #6b7280;
       font-size: 0.875rem;
     }
     
+    .entry-card .buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
     .entry-card button {
-      margin-right: 0.5rem;
-      margin-bottom: 0.25rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 4px;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
       font-size: 0.875rem;
       border: none;
       cursor: pointer;
       font-weight: 500;
+      transition: all 0.2s ease;
     }
     
-    .entry-card button:first-of-type {
-      background-color: #10b981;
+    .complete-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
+      position: relative;
+      overflow: hidden;
     }
     
-    .entry-card button:nth-of-type(2) {
+    .complete-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    
+    .complete-btn.completed {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    }
+    
+    .delete-btn {
       background-color: #ef4444;
       color: white;
     }
     
-    .entry-card button:last-of-type {
+    .delete-btn:hover {
+      background-color: #dc2626;
+      transform: scale(1.05);
+    }
+    
+    .details-btn {
       background-color: #6b7280;
       color: white;
     }
     
-    .entry-card button:hover {
-      opacity: 0.9;
+    .details-btn:hover {
+      background-color: #4b5563;
+      transform: scale(1.05);
+    }
+
+    /* Celebration animation */
+    .celebration {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .confetti {
+      width: 10px;
+      height: 10px;
+      background: #fbbf24;
+      position: absolute;
+      animation: confetti-fall 1s ease-out forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .checkmark {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #10b981;
+      position: relative;
+      animation: checkmark-scale 0.5s ease-out;
+    }
+
+    .checkmark::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    @keyframes checkmark-scale {
+      0% { transform: scale(0) rotate(0deg); opacity: 0; }
+      50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+      100% { transform: scale(1) rotate(360deg); opacity: 1; }
+    }
+
+    /* Progress ring animation */
+    .progress-ring {
+      transition: stroke-dashoffset 0.5s ease-in-out;
     }
 
     /* Modal styles */
@@ -71,17 +168,29 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal.show {
+      opacity: 1;
     }
     
     .modal-content {
       background-color: white;
       padding: 2rem;
-      border-radius: 8px;
+      border-radius: 12px;
       max-width: 500px;
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
       position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal.show .modal-content {
+      transform: scale(1);
     }
     
     .close-btn {
@@ -96,6 +205,65 @@
       height: 30px;
       cursor: pointer;
       font-weight: bold;
+      transition: transform 0.2s ease;
+    }
+    
+    .close-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Navigation tabs */
+    .nav-tab {
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .nav-tab.active {
+      color: #3b82f6;
+      border-bottom-color: #3b82f6;
+      font-weight: 600;
+    }
+    
+    .nav-tab:hover {
+      color: #3b82f6;
+    }
+
+    /* Page sections */
+    .page-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .page-section.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Streak counter */
+    .streak-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
   </style>
 </head>
@@ -105,86 +273,151 @@
     <div class="flex items-center space-x-4">
       <h1 class="text-2xl font-bold">Welcome, <span id="user-name">User</span></h1>
     </div>
-    <nav class="hidden md:flex space-x-4">
-      <a href="index.html" class="text-blue-600 font-semibold">Home</a>
-      <a href="calendar.html" class="text-gray-600 hover:text-blue-600">Calendar</a>
-      <a href="exercise.html" class="text-gray-600 hover:text-blue-600">Exercise</a>
-      <a href="progress.html" class="text-gray-600 hover:text-blue-600">Progress</a>
+    <nav class="hidden md:flex space-x-6">
+      <a href="#" class="nav-tab active" data-page="home">Home</a>
+      <a href="#" class="nav-tab" data-page="calendar">Calendar</a>
+      <a href="#" class="nav-tab" data-page="exercise">Exercise</a>
+      <a href="#" class="nav-tab" data-page="progress">Progress</a>
     </nav>
-    <button id="sign-out" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Sign Out</button>
+    <button id="sign-out" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">Sign Out</button>
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 pt-20 p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto">
+  <main class="flex-1 pt-20 p-4 overflow-auto">
+    
+    <!-- Home Page -->
+    <div id="home-page" class="page-section active">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        
+        <!-- Identity Vision Module -->
+        <section class="bg-white p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl font-semibold mb-2">Your Vision</h2>
+          <p id="identity-vision" class="mb-2 text-gray-700 min-h-12">Loading...</p>
+          <button id="edit-vision" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors">Edit Vision</button>
+        </section>
 
-    <!-- Identity Vision Module -->
-    <section class="bg-white p-4 rounded shadow">
-      <h2 class="text-xl font-semibold mb-2">Your Vision</h2>
-      <p id="identity-vision" class="mb-2 text-gray-700 min-h-12">Loading...</p>
-      <button id="edit-vision" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit Vision</button>
-    </section>
+        <!-- Add Habit/Task Module -->
+        <section class="bg-white p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl font-semibold mb-2">Add Habit or Task</h2>
+          <input id="habit-input" type="text" placeholder="Title" class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <textarea id="habit-note" placeholder="Optional note..." class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+          <select id="habit-type" class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="habit">Habit</option>
+            <option value="task">One-Time Task</option>
+          </select>
+          <button id="add-habit" class="bg-green-500 text-white px-4 py-2 w-full rounded hover:bg-green-600 transition-colors">Add</button>
+        </section>
 
-    <!-- Add Habit/Task Module -->
-    <section class="bg-white p-4 rounded shadow">
-      <h2 class="text-xl font-semibold mb-2">Add Habit or Task</h2>
-      <input id="habit-input" type="text" placeholder="Title" class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      <textarea id="habit-note" placeholder="Optional note..." class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
-      <select id="habit-type" class="w-full p-2 border mb-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <option value="habit">Habit</option>
-        <option value="task">One-Time Task</option>
-      </select>
-      <button id="add-habit" class="bg-green-500 text-white px-4 py-2 w-full rounded hover:bg-green-600">Add</button>
-    </section>
+        <!-- Quick Stats -->
+        <section class="bg-white p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl font-semibold mb-2">Today's Progress</h2>
+          <div id="stats-container">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-gray-600">Habits Completed:</span>
+              <span id="habits-completed" class="font-bold text-green-600">0/0</span>
+            </div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-gray-600">Tasks Completed:</span>
+              <span id="tasks-completed" class="font-bold text-blue-600">0/0</span>
+            </div>
+            <div class="flex justify-center mb-2">
+              <svg class="progress-ring" width="60" height="60">
+                <circle
+                  stroke="#e5e7eb"
+                  stroke-width="6"
+                  fill="transparent"
+                  r="24"
+                  cx="30"
+                  cy="30"/>
+                <circle
+                  id="progress-circle"
+                  stroke="url(#gradient)"
+                  stroke-width="6"
+                  fill="transparent"
+                  r="24"
+                  cx="30"
+                  cy="30"
+                  stroke-dasharray="150.8"
+                  stroke-dashoffset="150.8"
+                  stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <p class="text-sm text-gray-500 text-center">Keep going! You're doing great!</p>
+          </div>
+        </section>
 
-    <!-- Habits List -->
-    <section class="bg-white p-4 rounded shadow">
-      <h2 class="text-xl font-semibold mb-2">Habits</h2>
-      <div id="habits-container" class="space-y-2">
-        <p class="text-gray-500 text-sm">No habits yet. Add one above!</p>
+        <!-- Habits List -->
+        <section class="bg-white p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl font-semibold mb-2">Habits</h2>
+          <div id="habits-container" class="space-y-2">
+            <p class="text-gray-500 text-sm">No habits yet. Add one above!</p>
+          </div>
+        </section>
+
+        <!-- Tasks List -->
+        <section class="bg-white p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl font-semibold mb-2">One-Time Tasks</h2>
+          <div id="tasks-container" class="space-y-2">
+            <p class="text-gray-500 text-sm">No tasks yet. Add one above!</p>
+          </div>
+        </section>
+
+        <!-- Journal Section -->
+        <section class="bg-white p-4 rounded-lg shadow-lg col-span-full">
+          <h2 class="text-xl font-semibold mb-2">Daily Journal</h2>
+          <textarea id="journal-entry" rows="6" placeholder="Write your thoughts, reflections, or notes for today..." class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          <div class="flex justify-between items-center mt-2">
+            <button id="save-journal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">Save Journal</button>
+            <span class="text-sm text-gray-500" id="journal-status"></span>
+          </div>
+        </section>
+
       </div>
-    </section>
+    </div>
 
-    <!-- Tasks List -->
-    <section class="bg-white p-4 rounded shadow">
-      <h2 class="text-xl font-semibold mb-2">One-Time Tasks</h2>
-      <div id="tasks-container" class="space-y-2">
-        <p class="text-gray-500 text-sm">No tasks yet. Add one above!</p>
-      </div>
-    </section>
-
-    <!-- Quick Stats -->
-    <section class="bg-white p-4 rounded shadow">
-      <h2 class="text-xl font-semibold mb-2">Today's Progress</h2>
-      <div id="stats-container">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-600">Habits Completed:</span>
-          <span id="habits-completed" class="font-bold text-green-600">0</span>
+    <!-- Calendar Page -->
+    <div id="calendar-page" class="page-section">
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">Calendar View</h2>
+        <p class="text-gray-600">Your habit completion calendar will appear here.</p>
+        <div class="mt-4 p-4 bg-gray-50 rounded">
+          <p class="text-sm text-gray-500">Feature coming soon: Visual calendar showing your habit streaks and completion patterns.</p>
         </div>
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-gray-600">Tasks Completed:</span>
-          <span id="tasks-completed" class="font-bold text-blue-600">0</span>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-2">
-          <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style="width: 0%"></div>
-        </div>
-        <p class="text-sm text-gray-500 mt-1">Keep going! You're doing great!</p>
       </div>
-    </section>
+    </div>
 
-    <!-- Journal Section -->
-    <section class="bg-white p-4 rounded shadow col-span-full">
-      <h2 class="text-xl font-semibold mb-2">Daily Journal</h2>
-      <textarea id="journal-entry" rows="6" placeholder="Write your thoughts, reflections, or notes for today..." class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-      <div class="flex justify-between items-center mt-2">
-        <button id="save-journal" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Journal</button>
-        <span class="text-sm text-gray-500" id="journal-status"></span>
+    <!-- Exercise Page -->
+    <div id="exercise-page" class="page-section">
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">Exercise Tracker</h2>
+        <p class="text-gray-600">Track your workouts and physical activities here.</p>
+        <div class="mt-4 p-4 bg-gray-50 rounded">
+          <p class="text-sm text-gray-500">Feature coming soon: Dedicated exercise logging and workout templates.</p>
+        </div>
       </div>
-    </section>
+    </div>
+
+    <!-- Progress Page -->
+    <div id="progress-page" class="page-section">
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">Progress Analytics</h2>
+        <p class="text-gray-600">Detailed progress charts and statistics.</p>
+        <div class="mt-4 p-4 bg-gray-50 rounded">
+          <p class="text-sm text-gray-500">Feature coming soon: Charts showing completion rates, streaks, and progress over time.</p>
+        </div>
+      </div>
+    </div>
 
   </main>
 
   <!-- Modal for Entry Details -->
-  <div id="entry-modal" class="modal" style="display: none;">
+  <div id="entry-modal" class="modal">
     <div class="modal-content">
       <button id="close-modal" class="close-btn">&times;</button>
       <div id="modal-content">
@@ -195,18 +428,317 @@
 
   <!-- Mobile Navigation -->
   <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2">
-    <a href="index.html" class="flex flex-col items-center text-blue-600">
+    <a href="#" class="flex flex-col items-center nav-tab active" data-page="home">
       <span class="text-xs">Home</span>
     </a>
-    <a href="calendar.html" class="flex flex-col items-center text-gray-600">
+    <a href="#" class="flex flex-col items-center nav-tab" data-page="calendar">
       <span class="text-xs">Calendar</span>
     </a>
-    <a href="exercise.html" class="flex flex-col items-center text-gray-600">
+    <a href="#" class="flex flex-col items-center nav-tab" data-page="exercise">
       <span class="text-xs">Exercise</span>
     </a>
-    <a href="progress.html" class="flex flex-col items-center text-gray-600">
+    <a href="#" class="flex flex-col items-center nav-tab" data-page="progress">
       <span class="text-xs">Progress</span>
     </a>
   </nav>
+
+  <script type="module">
+    // Simulated authentication and data
+    let currentUser = { uid: 'demo-user', displayName: 'Demo User' };
+    let allEntries = [];
+    let userData = { vision: 'Define your future self vision here - what do you want to become?' };
+
+    // DOM elements
+    const userNameSpan = document.getElementById('user-name');
+    const visionSpan = document.getElementById('identity-vision');
+    const editVisionBtn = document.getElementById('edit-vision');
+    const habitInput = document.getElementById('habit-input');
+    const habitNote = document.getElementById('habit-note');
+    const habitType = document.getElementById('habit-type');
+    const addHabitBtn = document.getElementById('add-habit');
+    const habitsContainer = document.getElementById('habits-container');
+    const tasksContainer = document.getElementById('tasks-container');
+    const journalInput = document.getElementById('journal-entry');
+    const journalBtn = document.getElementById('save-journal');
+    const journalStatus = document.getElementById('journal-status');
+    const modal = document.getElementById('entry-modal');
+    const modalContent = document.getElementById('modal-content');
+    const closeModalBtn = document.getElementById('close-modal');
+
+    // Stats elements
+    const habitsCompletedSpan = document.getElementById('habits-completed');
+    const tasksCompletedSpan = document.getElementById('tasks-completed');
+    const progressCircle = document.getElementById('progress-circle');
+
+    // Initialize app
+    userNameSpan.textContent = currentUser.displayName;
+    visionSpan.textContent = userData.vision;
+    updateStats();
+
+    // Navigation handling
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetPage = tab.dataset.page;
+        showPage(targetPage);
+        
+        // Update active tab
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(pageId + '-page').classList.add('active');
+    }
+
+    // Edit vision handler
+    editVisionBtn.addEventListener('click', () => {
+      const currentVision = visionSpan.textContent;
+      const newVision = prompt('What is your updated vision?', currentVision);
+      if (newVision && newVision !== currentVision) {
+        userData.vision = newVision;
+        visionSpan.textContent = newVision;
+      }
+    });
+
+    // Add habit/task handler
+    addHabitBtn.addEventListener('click', () => {
+      const name = habitInput.value.trim();
+      const note = habitNote.value.trim();
+      const type = habitType.value;
+      
+      if (!name) {
+        alert('Please enter a title');
+        return;
+      }
+
+      const newEntry = {
+        id: Date.now().toString(),
+        name,
+        note,
+        type,
+        completed: false,
+        createdAt: new Date(),
+        history: [],
+        streak: 0
+      };
+      
+      allEntries.push(newEntry);
+      habitInput.value = '';
+      habitNote.value = '';
+      loadEntries();
+    });
+
+    // Journal handler
+    journalBtn.addEventListener('click', () => {
+      if (!journalInput.value.trim()) {
+        alert('Please write something in your journal');
+        return;
+      }
+      
+      journalStatus.textContent = 'Journal saved successfully!';
+      journalStatus.className = 'text-sm text-green-600';
+      
+      setTimeout(() => {
+        journalStatus.textContent = '';
+      }, 3000);
+    });
+
+    // Load entries
+    function loadEntries() {
+      habitsContainer.innerHTML = '';
+      tasksContainer.innerHTML = '';
+
+      if (allEntries.length === 0) {
+        habitsContainer.innerHTML = '<p class="text-gray-500 text-sm">No habits yet. Add one above!</p>';
+        tasksContainer.innerHTML = '<p class="text-gray-500 text-sm">No tasks yet. Add one above!</p>';
+        updateStats();
+        return;
+      }
+
+      allEntries.forEach(entry => {
+        const el = document.createElement('div');
+        el.className = `entry-card ${entry.completed ? 'completed' : ''}`;
+        el.innerHTML = `
+          <h4>${entry.name}</h4>
+          <p>${entry.note || 'No description'}</p>
+          <div class="buttons">
+            <button class="complete-btn ${entry.completed ? 'completed' : ''}" onclick="toggleComplete('${entry.id}')">
+              ${entry.completed ? '✓ Completed' : 'Mark Complete'}
+            </button>
+            <button class="delete-btn" onclick="deleteEntry('${entry.id}')">Delete</button>
+            <button class="details-btn" onclick="showDetails('${entry.id}')">Details</button>
+          </div>
+          ${entry.streak > 0 ? `<div class="streak-badge">${entry.streak}</div>` : ''}
+        `;
+
+        if (entry.type === 'habit') {
+          habitsContainer.appendChild(el);
+        } else {
+          tasksContainer.appendChild(el);
+        }
+      });
+      
+      updateStats();
+    }
+
+    // Update stats with animated progress ring
+    function updateStats() {
+      const habits = allEntries.filter(e => e.type === 'habit');
+      const tasks = allEntries.filter(e => e.type === 'task');
+      
+      const completedHabits = habits.filter(h => h.completed).length;
+      const completedTasks = tasks.filter(t => t.completed).length;
+      
+      habitsCompletedSpan.textContent = `${completedHabits}/${habits.length}`;
+      tasksCompletedSpan.textContent = `${completedTasks}/${tasks.length}`;
+      
+      const totalEntries = allEntries.length;
+      const totalCompleted = completedHabits + completedTasks;
+      const progressPercentage = totalEntries > 0 ? (totalCompleted / totalEntries) : 0;
+      
+      // Animate progress ring
+      const circumference = 2 * Math.PI * 24;
+      const offset = circumference - (progressPercentage * circumference);
+      progressCircle.style.strokeDashoffset = offset;
+    }
+
+    // Create celebration animation
+    function createCelebration(element) {
+      const celebration = document.createElement('div');
+      celebration.className = 'celebration';
+      
+      // Create checkmark
+      const checkmark = document.createElement('div');
+      checkmark.className = 'checkmark';
+      celebration.appendChild(checkmark);
+      
+      // Create confetti
+      for (let i = 0; i < 15; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.backgroundColor = ['#fbbf24', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6'][Math.floor(Math.random() * 5)];
+        confetti.style.left = Math.random() * 100 + 'px';
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        celebration.appendChild(confetti);
+      }
+      
+      element.appendChild(celebration);
+      
+      // Remove celebration after animation
+      setTimeout(() => {
+        celebration.remove();
+      }, 1500);
+    }
+
+    // Delete entry
+    window.deleteEntry = function(id) {
+      if (!confirm('Are you sure you want to delete this entry?')) return;
+      
+      allEntries = allEntries.filter(entry => entry.id !== id);
+      loadEntries();
+    };
+
+    // Toggle complete with celebration
+    window.toggleComplete = function(id) {
+      const entry = allEntries.find(e => e.id === id);
+      if (!entry) return;
+      
+      entry.completed = !entry.completed;
+      
+      if (entry.completed) {
+        entry.history.push(new Date());
+        entry.streak = (entry.streak || 0) + 1;
+        
+        // Create celebration animation
+        const entryElement = event.target.closest('.entry-card');
+        createCelebration(entryElement);
+        
+        // Haptic feedback if available
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+      } else {
+        entry.streak = Math.max(0, (entry.streak || 0) - 1);
+        if (entry.history.length > 0) {
+          entry.history.pop();
+        }
+      }
+      
+      setTimeout(() => {
+        loadEntries();
+      }, 500);
+    };
+
+    // Show details
+    window.showDetails = function(id) {
+      const entry = allEntries.find(e => e.id === id);
+      if (!entry) return;
+      
+      const history = entry.history || [];
+      
+      modalContent.innerHTML = `
+        <h3 class="text-xl font-bold mb-4">${entry.name}</h3>
+        <div class="space-y-2">
+          <p><strong>Type:</strong> ${entry.type}</p>
+          <p><strong>Description:</strong> ${entry.note || 'No description'}</p>
+          <p><strong>Status:</strong> ${entry.completed ? 'Completed' : 'Not completed'}</p>
+          <p><strong>Current Streak:</strong> ${entry.streak || 0}</p>
+          <p><strong>Created:</strong> ${entry.createdAt.toLocaleDateString()}</p>
+          <p><strong>Times Completed:</strong> ${history.length}</p>
+          ${history.length > 0 ? `
+            <div>
+              <strong>Completion History:</strong>
+              <ul class="mt-2 max-h-40 overflow-y-auto">
+                ${history.slice(-10).reverse().map(date => 
+                  `<li class="text-sm text-gray-600">• ${date.toLocaleString()}</li>`
+                ).join('')}
+              </ul>
+              ${history.length > 10 ? '<p class="text-xs text-gray-500 mt-1">Showing last 10 completions</p>' : ''}
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      modal.classList.add('show');
+      modal.style.display = 'flex';
+    };
+
+    // Close modal
+    closeModalBtn.addEventListener('click', () => {
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('show')) {
+        closeModalBtn.click();
+      }
+      
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && habitInput === document.activeElement) {
+        addHabitBtn.click();
+      }
+    });
+
+    // Load initial data
+    loadEntries();
+  </script>
 </body>
 </html>
