@@ -910,56 +910,72 @@
 
     let currentUser = null;
 
-    // Authentication handlers
-    document.getElementById('google-sign-in').addEventListener('click', async () => {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        console.log('User signed in:', result.user);
-      } catch (error) {
-        console.error('Sign in error:', error);
-        alert('Failed to sign in: ' + error.message);
-      }
+    // Wait for DOM to be ready before setting up authentication
+    document.addEventListener('DOMContentLoaded', () => {
+      setupAuthentication();
     });
 
-    document.getElementById('sign-out').addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-        console.log('User signed out');
-      } catch (error) {
-        console.error('Sign out error:', error);
-        alert('Failed to sign out: ' + error.message);
-      }
-    });
+    function setupAuthentication() {
+      // Authentication handlers
+      const signInBtn = document.getElementById('google-sign-in');
+      const signOutBtn = document.getElementById('sign-out');
 
-    // Authentication state listener
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('user-name').textContent = user.displayName || 'User';
-        await loadUserData();
-        initializeApp();
-        
-        // Initialize UI components after sign in
-        initNavigation();
-        initQuickAdd();
-        initVision();
-        initCalendarNavigation();
-      } else {
-        currentUser = null;
-        document.getElementById('login-overlay').style.display = 'flex';
-        document.getElementById('user-name').textContent = 'Loading...';
-        // Clear any existing data
-        appData = {
-          habits: [],
-          tasks: [],
-          completions: {},
-          exercises: [],
-          identityVision: "Define your future self vision here - what do you want to become?",
-          currentDate: new Date().toISOString().split('T')[0]
-        };
+      if (signInBtn) {
+        signInBtn.addEventListener('click', async () => {
+          try {
+            console.log('Sign in button clicked');
+            const result = await signInWithPopup(auth, provider);
+            console.log('User signed in:', result.user);
+          } catch (error) {
+            console.error('Sign in error:', error);
+            alert('Failed to sign in: ' + error.message);
+          }
+        });
       }
-    });
+
+      if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => {
+          try {
+            await signOut(auth);
+            console.log('User signed out');
+          } catch (error) {
+            console.error('Sign out error:', error);
+            alert('Failed to sign out: ' + error.message);
+          }
+        });
+      }
+
+      // Authentication state listener
+      onAuthStateChanged(auth, async (user) => {
+        console.log('Auth state changed:', user ? 'signed in' : 'signed out');
+        if (user) {
+          currentUser = user;
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('user-name').textContent = user.displayName || 'User';
+          await loadUserData();
+          initializeApp();
+          
+          // Initialize UI components after sign in
+          initNavigation();
+          initQuickAdd();
+          initVision();
+          initCalendarNavigation();
+        } else {
+          currentUser = null;
+          document.getElementById('login-overlay').style.display = 'flex';
+          document.getElementById('user-name').textContent = 'Loading...';
+          // Clear any existing data
+          appData = {
+            habits: [],
+            tasks: [],
+            completions: {},
+            exercises: [],
+            identityVision: "Define your future self vision here - what do you want to become?",
+            currentDate: new Date().toISOString().split('T')[0]
+          };
+        }
+      });
+    }
 
     // Load user data from Firestore
     async function loadUserData() {
