@@ -478,7 +478,7 @@
   <div id="sidebar" class="sidebar">
     <div class="sidebar-header">
       <h1 class="text-lg font-bold">Habit Tracker</h1>
-      <p class="text-sm opacity-90">Welcome, <span id="user-name">Demo User</span></p>
+      <p class="text-sm opacity-90">Welcome, <span id="user-name">Loading...</span></p>
     </div>
     
     <nav class="sidebar-nav">
@@ -509,8 +509,8 @@
     </nav>
     
     <div class="sidebar-footer">
-      <button id="demo-reset" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-sm">
-        Clear All Data
+      <button id="sign-out" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-sm">
+        Sign Out
       </button>
     </div>
   </div>
@@ -811,8 +811,199 @@
     </div>
   </div>
 
-  <script>
-    // Global app state - stored in memory instead of localStorage
+  <script type="module">
+    // Firebase imports
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js';
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged
+    } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js';
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      collection,
+      addDoc,
+      getDocs,
+      Timestamp
+    } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js';
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
+      authDomain: "habit-tracker-7c16d.firebaseapp.com",
+      projectId: "habit-tracker-7c16d",
+      storageBucket: "habit-tracker-7c16d.appspot.com",
+      messagingSenderId: "329214838371",
+      appId: "1:329214838371:web:4d50e8ddedffc72defda56"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+
+    // Authentication handlers
+    document.getElementById('google-sign-in').addEventListener('click', async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        console.log('User signed in:', result.user);
+      } catch (error) {
+        console.error('Sign in error:', error);
+        alert('Failed to sign in: ' + error.message);
+      }
+    });
+
+    document.getElementById('sign-out').addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        console.log('User signed out');
+      } catch (error) {
+        console.error('Sign out error:', error);
+        alert('Failed to sign out: ' + error.message);
+      }
+    });
+
+    // Authentication state listener
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('user-name').textContent = user.displayName || 'User';
+        await loadUserData();
+        initializeApp();
+        
+        // Initialize UI components after sign in
+        initNavigation();
+        initQuickAdd();
+        initVision();
+        initCalendarNavigation();
+      } else {
+        currentUser = null;
+        document.getElementById('login-overlay').style.display = 'flex';
+        document.getElementById('user-name').textContent = 'Loading...';
+        // Clear any existing data
+        appData = {
+          habits: [],
+          tasks: [],
+          completions: {},
+          exercises: [],
+          identityVision: "Define your future self vision here - what do you want to become?",
+          currentDate: new Date().toISOString().split('T')[0]
+        };
+      }
+    });
+
+    // Load user data from Firestore
+    async function loadUserData() {
+      if (!currentUser) return;
+      
+      try {
+        // Load user profile
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+          await setDoc(userDocRef, { 
+            vision: 'Define your future self vision here - what do you want to become?',
+            createdAt: Timestamp.now()
+          });
+          appData.identityVision = 'Define your future self vision here - what do you want to become?';
+        } else {
+          appData.identityVision = userDoc.data().vision || 'Define your future self vision here - what do you want to become?';
+        }
+        
+        // Load habits and tasks
+        const entriesSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'entries'));
+        appData.habits = [];
+        appData.tasks = [];
+        
+        entriesSnapshot.forEach(docSnap => {
+          const data = { id: docSnap.id, ...docSnap.data() };
+          if (data.type === 'habit') {
+            appData.habits.push(data);
+          } else {
+            appData.tasks.push(data);
+          }
+        });
+        
+        // Load completions
+        const completionsSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'completions'));
+        appData.completions = {};
+        completionsSnapshot.forEach(docSnap => {
+          appData.completions[docSnap.id] = docSnap.data();
+        });
+        
+        // Load exercises
+        const exercisesSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'exercises'));
+        appData.exercises = [];
+        exercisesSnapshot.forEach(docSnap => {
+          appData.exercises.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    }
+
+    // Save data to Firestore
+    async function saveEntry(entry) {
+      if (!currentUser) return;
+      
+      try {
+        if (entry.id && entry.id !== Date.now().toString()) {
+          // Update existing entry
+          await updateDoc(doc(db, 'users', currentUser.uid, 'entries', entry.id), entry);
+        } else {
+          // Create new entry
+          const docRef = await addDoc(collection(db, 'users', currentUser.uid, 'entries'), entry);
+          entry.id = docRef.id;
+        }
+      } catch (error) {
+        console.error('Error saving entry:', error);
+      }
+    }
+
+    async function saveCompletion(completionKey, completionData) {
+      if (!currentUser) return;
+      
+      try {
+        await setDoc(doc(db, 'users', currentUser.uid, 'completions', completionKey), completionData);
+      } catch (error) {
+        console.error('Error saving completion:', error);
+      }
+    }
+
+    async function deleteCompletion(completionKey) {
+      if (!currentUser) return;
+      
+      try {
+        await deleteDoc(doc(db, 'users', currentUser.uid, 'completions', completionKey));
+      } catch (error) {
+        console.error('Error deleting completion:', error);
+      }
+    }
+
+    async function saveVisionToFirebase(vision) {
+      if (!currentUser) return;
+      
+      try {
+        await updateDoc(doc(db, 'users', currentUser.uid), { vision });
+      } catch (error) {
+        console.error('Error saving vision:', error);
+      }
+    }
+
+    // Global app state
     let appData = {
       habits: [],
       tasks: [],
@@ -981,7 +1172,10 @@
       const type = document.getElementById('habit-type').value;
       const note = document.getElementById('habit-note').value.trim();
       
-      if (!text) return;
+      if (!text) {
+        alert('Please enter a title');
+        return;
+      }
       
       const newItem = {
         id: Date.now().toString(),
@@ -997,10 +1191,21 @@
         appData.tasks.push(newItem);
       }
       
+      // Save to Firebase
+      saveEntry(newItem);
+      
       closeQuickAdd();
       updateStats();
       renderTodaysItems();
       renderCurrentPage();
+      
+      // Show success feedback
+      const container = document.getElementById('quick-add-container');
+      const originalBorder = container.style.borderColor;
+      container.style.borderColor = '#10b981';
+      setTimeout(() => {
+        container.style.borderColor = originalBorder;
+      }, 1000);
     }
 
     // Item rendering functions
@@ -1084,11 +1289,14 @@
       
       if (appData.completions[completionKey]) {
         delete appData.completions[completionKey];
+        deleteCompletion(completionKey);
       } else {
-        appData.completions[completionKey] = {
+        const completionData = {
           completedAt: new Date().toISOString(),
           date: today
         };
+        appData.completions[completionKey] = completionData;
+        saveCompletion(completionKey, completionData);
       }
       
       updateStats();
@@ -1102,7 +1310,9 @@
       let streak = 0;
       let currentDate = new Date(today);
       
-      // Check backwards from today
+      // Check backwards from yesterday (don't include today in streak calculation)
+      currentDate.setDate(currentDate.getDate() - 1);
+      
       while (true) {
         const dateStr = currentDate.toISOString().split('T')[0];
         const completionKey = `${itemId}-${dateStr}`;
@@ -1162,6 +1372,7 @@
       if (newVision) {
         appData.identityVision = newVision;
         document.getElementById('identity-vision').textContent = newVision;
+        saveVisionToFirebase(newVision);
       }
       closeVisionModal();
     }
@@ -1203,6 +1414,7 @@
 
     function deleteItem(itemId) {
       if (confirm('Are you sure you want to delete this item?')) {
+        // Remove from local state
         appData.habits = appData.habits.filter(h => h.id !== itemId);
         appData.tasks = appData.tasks.filter(t => t.id !== itemId);
         
@@ -1210,8 +1422,14 @@
         Object.keys(appData.completions).forEach(key => {
           if (key.startsWith(itemId + '-')) {
             delete appData.completions[key];
+            deleteCompletion(key);
           }
         });
+        
+        // Delete from Firebase
+        if (currentUser) {
+          deleteDoc(doc(db, 'users', currentUser.uid, 'entries', itemId)).catch(console.error);
+        }
         
         closeDetailsModal();
         updateStats();
@@ -1260,13 +1478,12 @@
     }
 
     function renderCalendar() {
-      // Simple calendar implementation
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
+      // Get current calendar date (use the tracked month/year)
+      const year = currentCalendarYear;
+      const month = currentCalendarMonth;
       
       document.getElementById('current-month').textContent = 
-        now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
       
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -1282,7 +1499,8 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         const dateStr = date.toISOString().split('T')[0];
-        const isToday = dateStr === new Date().toISOString().split('T')[0];
+        const today = new Date();
+        const isToday = dateStr === today.toISOString().split('T')[0];
         
         // Count completions for this day
         const completions = Object.keys(appData.completions).filter(key => key.endsWith('-' + dateStr)).length;
@@ -1291,7 +1509,7 @@
         let dayClass = 'text-center py-2 border rounded min-h-12 cursor-pointer hover:bg-gray-50';
         if (isToday) dayClass += ' bg-blue-200 font-bold';
         else if (completions > 0) dayClass += ' bg-green-200';
-        else if (date < new Date() && totalItems > 0) dayClass += ' bg-red-100';
+        else if (date < today && totalItems > 0) dayClass += ' bg-red-100';
         
         html += `
           <div class="${dayClass}">
@@ -1311,6 +1529,7 @@
       updateExerciseStats();
     }
 
+    // Exercise logging with Firebase
     function logExercise() {
       const type = document.getElementById('exercise-type').value;
       const duration = parseInt(document.getElementById('exercise-duration').value);
@@ -1322,21 +1541,27 @@
       }
       
       const exercise = {
-        id: Date.now().toString(),
         type: type,
         duration: duration,
         notes: notes,
         date: new Date().toISOString()
       };
       
-      appData.exercises.push(exercise);
+      // Save to Firebase
+      if (currentUser) {
+        addDoc(collection(db, 'users', currentUser.uid, 'exercises'), exercise)
+          .then(docRef => {
+            exercise.id = docRef.id;
+            appData.exercises.push(exercise);
+            renderExerciseHistory();
+            updateExerciseStats();
+          })
+          .catch(console.error);
+      }
       
       // Clear form
       document.getElementById('exercise-duration').value = '';
       document.getElementById('exercise-notes').value = '';
-      
-      renderExerciseHistory();
-      updateExerciseStats();
     }
 
     function renderExerciseHistory() {
@@ -1457,21 +1682,7 @@
 
     // Demo reset function (now just clears all data)
     function initDemoReset() {
-      document.getElementById('demo-reset').addEventListener('click', () => {
-        if (confirm('This will clear all your data. Continue?')) {
-          appData = {
-            habits: [],
-            tasks: [],
-            completions: {},
-            exercises: [],
-            identityVision: "Define your future self vision here - what do you want to become?",
-            currentDate: new Date().toISOString().split('T')[0]
-          };
-          loadAppData();
-          updateStats();
-          renderCurrentPage();
-        }
-      });
+      // Removed - no longer needed as we have proper sign out
     }
 
     // Calendar navigation
@@ -1508,15 +1719,8 @@
     window.closeVisionModal = closeVisionModal;
     window.saveVision = saveVision;
 
-    // Initialize app when page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeApp();
-      initNavigation();
-      initQuickAdd();
-      initVision();
-      initDemoReset();
-      initCalendarNavigation();
-    });
+    // Initialize app when page loads - but only after authentication
+    // The actual initialization happens in the onAuthStateChanged listener
   </script>
 </body>
 </html>
