@@ -135,6 +135,298 @@
       cursor: pointer;
     }
 
+    /* Routine-specific styles */
+    .routine-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      color: white;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    
+    .routine-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    
+    .routine-subtitle {
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+    }
+    
+    .routine-habits {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .routine-habit {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255,255,255,0.15);
+      padding: 1rem;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .routine-habit:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+    
+    .routine-habit-checkbox {
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .routine-habit-checkbox.checked {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
+    }
+    
+    .routine-habit-checkbox.wont-complete {
+      background: #f59e0b;
+      border-color: #f59e0b;
+      color: white;
+    }
+    
+    .routine-habit-name {
+      flex-grow: 1;
+      font-weight: 500;
+    }
+    
+    .routine-habit-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .wont-complete-btn {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #f59e0b;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .wont-complete-btn:hover {
+      background: rgba(245, 158, 11, 0.3);
+    }
+    
+    .complete-routine-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.5);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .complete-routine-btn:hover {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.8);
+      transform: translateY(-2px);
+    }
+    
+    .upcoming-routines {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .upcoming-routine {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      color: #6b7280;
+    }
+    
+    .upcoming-routine:last-child {
+      margin-bottom: 0;
+    }
+    
+    .upcoming-routine-name {
+      font-weight: 500;
+    }
+    
+    .upcoming-routine-count {
+      font-size: 0.875rem;
+      background: #e5e7eb;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    /* Routine Manager styles */
+    .routine-builder {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    
+    .available-habits {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 2px dashed #d1d5db;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .draggable-habit {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #f3f4f6;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      cursor: grab;
+      transition: all 0.2s ease;
+    }
+    
+    .draggable-habit:hover {
+      background: #e5e7eb;
+      transform: translateY(-1px);
+    }
+    
+    .draggable-habit:active {
+      cursor: grabbing;
+    }
+    
+    .drag-handle {
+      color: #9ca3af;
+      cursor: grab;
+      font-size: 0.875rem;
+    }
+    
+    .routine-drop-zone {
+      min-height: 150px;
+      border: 3px dashed #d1d5db;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #6b7280;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+    
+    .routine-drop-zone.drag-over {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      color: #1e40af;
+    }
+    
+    .routine-habits-list {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 1rem;
+      min-height: 100px;
+    }
+    
+    .routine-habit-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: white;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      cursor: grab;
+      transition: all 0.2s ease;
+    }
+    
+    .routine-habit-item:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    
+    .routine-habit-item:active {
+      cursor: grabbing;
+    }
+    
+    .routine-habit-order {
+      background: #3b82f6;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .remove-habit-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    
+    .remove-habit-btn:hover {
+      background: #dc2626;
+      transform: scale(1.1);
+    }
+    
+    .routine-day-selector {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .routine-day-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .routine-day {
+      margin-bottom: 0.25rem;
+    }
+
     /* Multi-column grid for entries */
     .entries-grid {
       display: grid;
@@ -492,6 +784,31 @@
       display: none !important;
     }
 
+    /* Celebration animation */
+    .celebration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ff6b6b;
+      animation: confetti-fall 3s linear infinite;
+    }
+    
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .compact-entry {
@@ -506,6 +823,14 @@
       .quick-btn {
         padding: 0.25rem 0.375rem;
         font-size: 0.7rem;
+      }
+      
+      .routine-card {
+        padding: 1.5rem;
+      }
+      
+      .routine-habit {
+        padding: 0.75rem;
       }
     }
   </style>
@@ -543,6 +868,10 @@
       <div class="sidebar-nav-item active" data-page="home">
         <span class="sidebar-nav-icon">🏠</span>
         <span>Dashboard</span>
+      </div>
+      <div class="sidebar-nav-item" data-page="routines">
+        <span class="sidebar-nav-icon">🔄</span>
+        <span>Routine Manager</span>
       </div>
       <div class="sidebar-nav-item" data-page="habits">
         <span class="sidebar-nav-icon">🎯</span>
@@ -593,28 +922,44 @@
       
       <!-- Dashboard Page -->
       <div id="home-page" class="page-section active">
-        <!-- Top Stats Row -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div class="stat-item">
-            <div class="stat-number text-green-600" id="habits-completed">0/0</div>
-            <div class="stat-label">Habits Today</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number text-blue-600" id="tasks-completed">0/0</div>
-            <div class="stat-label">Tasks Today</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number text-purple-600" id="streak-count">0</div>
-            <div class="stat-label">Best Streak</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number text-orange-600" id="completion-rate">0%</div>
-            <div class="stat-label">Today's Rate</div>
+        <!-- Current Active Routine -->
+        <div id="current-routine-container">
+          <!-- Active routine will be populated here -->
+        </div>
+
+        <!-- Upcoming Routines -->
+        <div id="upcoming-routines-section" class="upcoming-routines mb-6">
+          <h3 class="text-lg font-semibold mb-3">Today's Schedule</h3>
+          <div id="upcoming-routines-list">
+            <!-- Upcoming routines will be populated here -->
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Original Dashboard (fallback when no routine active) -->
+        <div id="original-dashboard" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           
+          <!-- Top Stats Row -->
+          <div class="col-span-full">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div class="stat-item">
+                <div class="stat-number text-green-600" id="habits-completed">0/0</div>
+                <div class="stat-label">Habits Today</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number text-blue-600" id="tasks-completed">0/0</div>
+                <div class="stat-label">Tasks Today</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number text-purple-600" id="streak-count">0</div>
+                <div class="stat-label">Best Streak</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number text-orange-600" id="completion-rate">0%</div>
+                <div class="stat-label">Today's Rate</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Identity Vision Module -->
           <section class="bg-white p-4 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold mb-2">Your Vision</h2>
@@ -673,6 +1018,101 @@
               </div>
             </div>
           </section>
+
+        </div>
+      </div>
+
+      <!-- Routine Manager Page -->
+      <div id="routines-page" class="page-section">
+        <div class="space-y-6">
+          
+          <!-- Create New Routine -->
+          <div class="routine-builder">
+            <h2 class="text-2xl font-bold mb-6">Create New Routine</h2>
+            
+            <!-- Routine Name and Time -->
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label class="block text-sm font-medium mb-2">Routine Name</label>
+                <input id="routine-name" type="text" placeholder="Morning Routine" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Start Time</label>
+                <input id="routine-start-time" type="time" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+            </div>
+
+            <!-- Days Selection -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium mb-3">Days of Week</label>
+              <div class="routine-day-selector">
+                <div class="routine-day-option">
+                  <input type="checkbox" id="day-0" class="routine-day" value="0">
+                  <label for="day-0" class="text-sm">Sun</label>
+                </div>
+                <div class="routine-day-option">
+                  <input type="checkbox" id="day-1" class="routine-day" value="1">
+                  <label for="day-1" class="text-sm">Mon</label>
+                </div>
+                <div class="routine-day-option">
+                  <input type="checkbox" id="day-2" class="routine-day" value="2">
+                  <label for="day-2" class="text-sm">Tue</label>
+                </div>
+                <div class="routine-day-option">
+                  <input type="checkbox" id="day-3" class="routine-day" value="3">
+                  <label for="day-3" class="text-sm">Wed</label>
+                </div>
+                <div class="routine-day-option">
+                  <input type="checkbox" id="day-4" class="routine-day" value="4">
+                  <label for="day-4" class="text-sm">Thu</label>
+                </div>
+                <div class="routine-day-option">
+                  <input type="checkbox" id="day-5" class="routine-day" value="5">
+                  <label for="day-5" class="text-sm">Fri</label>
+                </div>
+                <div class="routine-day-option">
+                  <input type="checkbox" id="day-6" class="routine-day" value="6">
+                  <label for="day-6" class="text-sm">Sat</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Available Habits -->
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold mb-3">Available Habits</h3>
+              <div id="available-habits" class="available-habits">
+                <p class="text-gray-500 text-center py-4">Loading habits...</p>
+              </div>
+            </div>
+
+            <!-- Drop Zone and Routine Builder -->
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold mb-3">Build Your Routine</h3>
+              
+              <div id="routine-drop-zone" class="routine-drop-zone">
+                <div class="text-lg mb-2">🎯</div>
+                <div>Drag habits from the list above to build your routine</div>
+                <div class="text-sm mt-2 opacity-75">Habits will be completed in the order you arrange them</div>
+              </div>
+              
+              <div id="routine-habits-list" class="routine-habits-list">
+                <!-- Routine habits will be populated here -->
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <button id="save-routine" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold">
+              Save Routine
+            </button>
+          </div>
+
+          <!-- Existing Routines -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-xl font-bold mb-4">Your Routines</h2>
+            <div id="existing-routines">
+              <p class="text-gray-500 text-center py-8">Loading routines...</p>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -869,6 +1309,16 @@
     </div>
   </div>
 
+  <!-- Celebration Overlay -->
+  <div id="celebration" class="celebration" style="display: none;">
+    <!-- Confetti will be generated here -->
+  </div>
+
+  <!-- Audio for ding sound -->
+  <audio id="completion-sound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmMdBifA8N+UQAkUWLHn7qxZGAgW3mq7+9V7D9ZK" type="audio/wav">
+  </audio>
+
   <script type="module">
     // Firebase imports
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js';
@@ -909,6 +1359,20 @@
     const provider = new GoogleAuthProvider();
 
     let currentUser = null;
+    let routineHabits = [];
+    let currentCalendarMonth = new Date().getMonth();
+    let currentCalendarYear = new Date().getFullYear();
+
+    // Global app state
+    let appData = {
+      habits: [],
+      tasks: [],
+      completions: {},
+      exercises: [],
+      routines: [],
+      identityVision: "Define your future self vision here - what do you want to become?",
+      currentDate: new Date().toISOString().split('T')[0]
+    };
 
     // Initialize Firebase first
     console.log('Initializing Firebase...');
@@ -927,10 +1391,6 @@
       const signInBtn = document.getElementById('google-sign-in');
       const signOutBtn = document.getElementById('sign-out');
       const loginOverlay = document.getElementById('login-overlay');
-
-      console.log('Sign in button found:', !!signInBtn);
-      console.log('Sign out button found:', !!signOutBtn);
-      console.log('Login overlay found:', !!loginOverlay);
 
       // Authentication handlers
       if (signInBtn) {
@@ -960,8 +1420,6 @@
             `;
           }
         });
-      } else {
-        console.error('Sign in button not found!');
       }
 
       if (signOutBtn) {
@@ -1001,6 +1459,7 @@
           initQuickAdd();
           initVision();
           initCalendarNavigation();
+          initRoutineManager();
           
         } else {
           currentUser = null;
@@ -1021,6 +1480,7 @@
             tasks: [],
             completions: {},
             exercises: [],
+            routines: [],
             identityVision: "Define your future self vision here - what do you want to become?",
             currentDate: new Date().toISOString().split('T')[0]
           };
@@ -1075,777 +1535,9 @@
           appData.exercises.push({ id: docSnap.id, ...docSnap.data() });
         });
         
-      } catch (error) {
-        console.error('Error loading user data:', error);
-      }
-    }
-
-    // Save data to Firestore
-    async function saveEntry(entry) {
-      if (!currentUser) return;
-      
-      try {
-        if (entry.id && entry.id !== Date.now().toString()) {
-          // Update existing entry
-          await updateDoc(doc(db, 'users', currentUser.uid, 'entries', entry.id), entry);
-        } else {
-          // Create new entry
-          const docRef = await addDoc(collection(db, 'users', currentUser.uid, 'entries'), entry);
-          entry.id = docRef.id;
-        }
-      } catch (error) {
-        console.error('Error saving entry:', error);
-      }
-    }
-
-    async function saveCompletion(completionKey, completionData) {
-      if (!currentUser) return;
-      
-      try {
-        await setDoc(doc(db, 'users', currentUser.uid, 'completions', completionKey), completionData);
-      } catch (error) {
-        console.error('Error saving completion:', error);
-      }
-    }
-
-    async function deleteCompletion(completionKey) {
-      if (!currentUser) return;
-      
-      try {
-        await deleteDoc(doc(db, 'users', currentUser.uid, 'completions', completionKey));
-      } catch (error) {
-        console.error('Error deleting completion:', error);
-      }
-    }
-
-    async function saveVisionToFirebase(vision) {
-      if (!currentUser) return;
-      
-      try {
-        await updateDoc(doc(db, 'users', currentUser.uid), { vision });
-      } catch (error) {
-        console.error('Error saving vision:', error);
-      }
-    }
-
-    // Global app state
-    let appData = {
-      habits: [],
-      tasks: [],
-      completions: {},
-      exercises: [],
-      identityVision: "Define your future self vision here - what do you want to become?",
-      currentDate: new Date().toISOString().split('T')[0]
-    };
-
-    // Initialize app
-    function initializeHabitApp() {
-      loadAppData();
-      updateCurrentDate();
-      renderCurrentPage();
-    }
-
-    // Data management functions
-    function loadAppData() {
-      document.getElementById('identity-vision').textContent = appData.identityVision;
-      updateStats();
-      renderTodaysItems();
-      renderCompletedItems();
-    }
-
-    function updateCurrentDate() {
-      const now = new Date();
-      const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      };
-      document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
-    }
-
-    // Navigation functions
-    function initNavigation() {
-      const navItems = document.querySelectorAll('.sidebar-nav-item');
-      navItems.forEach(item => {
-        item.addEventListener('click', () => {
-          const page = item.dataset.page;
-          switchPage(page);
-          
-          // Update active state
-          navItems.forEach(nav => nav.classList.remove('active'));
-          item.classList.add('active');
-          
-          // Close mobile sidebar
-          closeMobileSidebar();
+        // Load routines
+        const routinesSnapshot = await getDocs(collection(db, 'users', currentUser.uid, 'routines'));
+        appData.routines = [];
+        routinesSnapshot.forEach(docSnap => {
+          appData.routines.push({ id: docSnap.id, ...docSnap.data() });
         });
-      });
-
-      // Mobile menu functionality
-      document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.add('open');
-        document.getElementById('sidebar-overlay').classList.add('show');
-      });
-
-      document.getElementById('sidebar-overlay').addEventListener('click', closeMobileSidebar);
-    }
-
-    function closeMobileSidebar() {
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('sidebar-overlay').classList.remove('show');
-    }
-
-    function switchPage(pageId) {
-      // Hide all pages
-      document.querySelectorAll('.page-section').forEach(page => {
-        page.classList.remove('active');
-      });
-      
-      // Show selected page
-      document.getElementById(pageId + '-page').classList.add('active');
-      
-      // Update page title
-      const titles = {
-        home: 'Dashboard',
-        habits: 'All Habits',
-        tasks: 'All Tasks',
-        calendar: 'Calendar',
-        exercise: 'Exercise',
-        analytics: 'Analytics'
-      };
-      document.getElementById('page-title').textContent = titles[pageId] || 'Dashboard';
-      
-      // Render page-specific content
-      renderCurrentPage();
-    }
-
-    function renderCurrentPage() {
-      const activePage = document.querySelector('.page-section.active');
-      if (!activePage) return;
-      
-      const pageId = activePage.id.replace('-page', '');
-      
-      switch(pageId) {
-        case 'habits':
-          renderAllHabits();
-          break;
-        case 'tasks':
-          renderAllTasks();
-          break;
-        case 'calendar':
-          renderCalendar();
-          break;
-        case 'exercise':
-          renderExercisePage();
-          break;
-        case 'analytics':
-          renderAnalytics();
-          break;
-        default:
-          // Dashboard is already rendered
-          break;
-      }
-    }
-
-    // Quick add functionality
-    function initQuickAdd() {
-      const container = document.getElementById('quick-add-container');
-      const prompt = document.getElementById('add-prompt');
-      const form = document.getElementById('add-form');
-      const input = document.getElementById('habit-input');
-      const addBtn = document.getElementById('add-habit');
-
-      prompt.addEventListener('click', () => {
-        container.classList.add('active');
-        form.classList.add('active');
-        prompt.style.display = 'none';
-        input.focus();
-      });
-
-      addBtn.addEventListener('click', addNewItem);
-      
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          addNewItem();
-        }
-      });
-
-      // Click outside to close
-      document.addEventListener('click', (e) => {
-        if (!container.contains(e.target)) {
-          closeQuickAdd();
-        }
-      });
-    }
-
-    function closeQuickAdd() {
-      const container = document.getElementById('quick-add-container');
-      const prompt = document.getElementById('add-prompt');
-      const form = document.getElementById('add-form');
-      
-      container.classList.remove('active');
-      form.classList.remove('active');
-      prompt.style.display = 'block';
-      
-      // Clear form
-      document.getElementById('habit-input').value = '';
-      document.getElementById('habit-note').value = '';
-    }
-
-    function addNewItem() {
-      const text = document.getElementById('habit-input').value.trim();
-      const type = document.getElementById('habit-type').value;
-      const note = document.getElementById('habit-note').value.trim();
-      
-      if (!text) {
-        alert('Please enter a title');
-        return;
-      }
-      
-      const newItem = {
-        id: Date.now().toString(),
-        text: text,
-        type: type,
-        createdAt: new Date().toISOString(),
-        note: note
-      };
-      
-      if (type === 'habit') {
-        appData.habits.push(newItem);
-      } else {
-        appData.tasks.push(newItem);
-      }
-      
-      // Save to Firebase
-      saveEntry(newItem);
-      
-      closeQuickAdd();
-      updateStats();
-      renderTodaysItems();
-      renderCurrentPage();
-      
-      // Show success feedback
-      const container = document.getElementById('quick-add-container');
-      const originalBorder = container.style.borderColor;
-      container.style.borderColor = '#10b981';
-      setTimeout(() => {
-        container.style.borderColor = originalBorder;
-      }, 1000);
-    }
-
-    // Item rendering functions
-    function createCompactEntry(item, isCompleted = false) {
-      const today = new Date().toISOString().split('T')[0];
-      const completionKey = `${item.id}-${today}`;
-      const completed = isCompleted || appData.completions[completionKey];
-      
-      const streak = calculateStreak(item.id);
-      
-      return `
-        <div class="compact-entry ${completed ? 'completed' : ''}" data-id="${item.id}">
-          <div class="header">
-            <div class="content">
-              <h3 class="title">${item.text}</h3>
-              <span class="type-badge ${item.type}-badge">${item.type}</span>
-            </div>
-            ${streak > 0 ? `<div class="streak-indicator">${streak}</div>` : ''}
-          </div>
-          <div class="actions">
-            <div class="left-actions">
-              <button class="details-btn quick-btn" onclick="showDetails('${item.id}')" title="Details">ℹ️</button>
-            </div>
-            <button class="complete-btn ${completed ? 'completed' : ''}" 
-                    onclick="toggleCompletion('${item.id}')" 
-                    title="${completed ? 'Mark incomplete' : 'Mark complete'}">
-              ${completed ? '✅' : '○'}
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderTodaysItems() {
-      const container = document.getElementById('todays-items');
-      const allItems = [...appData.habits, ...appData.tasks];
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Filter incomplete items for today
-      const incompleteItems = allItems.filter(item => {
-        const completionKey = `${item.id}-${today}`;
-        return !appData.completions[completionKey];
-      });
-      
-      if (incompleteItems.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-full text-center py-8 text-gray-500">
-            <div class="text-4xl mb-2">🎉</div>
-            <p>All done for today! Great work!</p>
-          </div>
-        `;
-        return;
-      }
-      
-      container.innerHTML = incompleteItems.map(item => createCompactEntry(item)).join('');
-    }
-
-    function renderCompletedItems() {
-      const container = document.getElementById('completed-items');
-      const allItems = [...appData.habits, ...appData.tasks];
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Filter completed items for today
-      const completedItems = allItems.filter(item => {
-        const completionKey = `${item.id}-${today}`;
-        return appData.completions[completionKey];
-      });
-      
-      if (completedItems.length === 0) {
-        container.innerHTML = `<p class="text-gray-500 text-sm text-center py-4 col-span-full">No completed items yet</p>`;
-        return;
-      }
-      
-      container.innerHTML = completedItems.map(item => createCompactEntry(item, true)).join('');
-    }
-
-    // Completion functions
-    function toggleCompletion(itemId) {
-      const today = new Date().toISOString().split('T')[0];
-      const completionKey = `${itemId}-${today}`;
-      
-      if (appData.completions[completionKey]) {
-        delete appData.completions[completionKey];
-        deleteCompletion(completionKey);
-      } else {
-        const completionData = {
-          completedAt: new Date().toISOString(),
-          date: today
-        };
-        appData.completions[completionKey] = completionData;
-        saveCompletion(completionKey, completionData);
-      }
-      
-      updateStats();
-      renderTodaysItems();
-      renderCompletedItems();
-      renderCurrentPage();
-    }
-
-    function calculateStreak(itemId) {
-      const today = new Date();
-      let streak = 0;
-      let currentDate = new Date(today);
-      
-      // Check backwards from yesterday (don't include today in streak calculation)
-      currentDate.setDate(currentDate.getDate() - 1);
-      
-      while (true) {
-        const dateStr = currentDate.toISOString().split('T')[0];
-        const completionKey = `${itemId}-${dateStr}`;
-        
-        if (appData.completions[completionKey]) {
-          streak++;
-          currentDate.setDate(currentDate.getDate() - 1);
-        } else {
-          break;
-        }
-      }
-      
-      return streak;
-    }
-
-    // Stats functions
-    function updateStats() {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Today's completion stats
-      const habitsToday = appData.habits.length;
-      const tasksToday = appData.tasks.length;
-      
-      const completedHabits = appData.habits.filter(h => appData.completions[`${h.id}-${today}`]).length;
-      const completedTasks = appData.tasks.filter(t => appData.completions[`${t.id}-${today}`]).length;
-      
-      document.getElementById('habits-completed').textContent = `${completedHabits}/${habitsToday}`;
-      document.getElementById('tasks-completed').textContent = `${completedTasks}/${tasksToday}`;
-      
-      // Best streak
-      const bestStreak = Math.max(0, ...appData.habits.map(h => calculateStreak(h.id)));
-      document.getElementById('streak-count').textContent = bestStreak;
-      
-      // Completion rate
-      const totalItems = habitsToday + tasksToday;
-      const completedItems = completedHabits + completedTasks;
-      const rate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
-      document.getElementById('completion-rate').textContent = `${rate}%`;
-    }
-
-    // Vision functions
-    function initVision() {
-      document.getElementById('edit-vision').addEventListener('click', openVisionModal);
-    }
-
-    function openVisionModal() {
-      document.getElementById('vision-input').value = appData.identityVision;
-      document.getElementById('vision-modal').classList.add('show');
-    }
-
-    function closeVisionModal() {
-      document.getElementById('vision-modal').classList.remove('show');
-    }
-
-    function saveVision() {
-      const newVision = document.getElementById('vision-input').value.trim();
-      if (newVision) {
-        appData.identityVision = newVision;
-        document.getElementById('identity-vision').textContent = newVision;
-        saveVisionToFirebase(newVision);
-      }
-      closeVisionModal();
-    }
-
-    // Details modal functions
-    function showDetails(itemId) {
-      const item = [...appData.habits, ...appData.tasks].find(i => i.id === itemId);
-      if (!item) return;
-      
-      const streak = calculateStreak(itemId);
-      const createdDate = new Date(item.createdAt).toLocaleDateString();
-      
-      const content = `
-        <h2 class="text-xl font-bold mb-4">${item.text}</h2>
-        <div class="space-y-3">
-          <div>
-            <strong>Type:</strong> ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-          </div>
-          <div>
-            <strong>Created:</strong> ${createdDate}
-          </div>
-          ${item.type === 'habit' ? `<div><strong>Current Streak:</strong> ${streak} days</div>` : ''}
-          ${item.note ? `<div><strong>Note:</strong><br><p class="mt-1 text-gray-700">${item.note}</p></div>` : ''}
-          <div class="mt-6 pt-4 border-t">
-            <button onclick="deleteItem('${itemId}')" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
-              Delete ${item.type}
-            </button>
-          </div>
-        </div>
-      `;
-      
-      document.getElementById('details-content').innerHTML = content;
-      document.getElementById('details-modal').classList.add('show');
-    }
-
-    function closeDetailsModal() {
-      document.getElementById('details-modal').classList.remove('show');
-    }
-
-    function deleteItem(itemId) {
-      if (confirm('Are you sure you want to delete this item?')) {
-        // Remove from local state
-        appData.habits = appData.habits.filter(h => h.id !== itemId);
-        appData.tasks = appData.tasks.filter(t => t.id !== itemId);
-        
-        // Remove completions for this item
-        Object.keys(appData.completions).forEach(key => {
-          if (key.startsWith(itemId + '-')) {
-            delete appData.completions[key];
-            deleteCompletion(key);
-          }
-        });
-        
-        // Delete from Firebase
-        if (currentUser) {
-          deleteDoc(doc(db, 'users', currentUser.uid, 'entries', itemId)).catch(console.error);
-        }
-        
-        closeDetailsModal();
-        updateStats();
-        renderTodaysItems();
-        renderCompletedItems();
-        renderCurrentPage();
-      }
-    }
-
-    // Section toggle functions
-    function toggleSection(sectionId) {
-      const content = document.getElementById(sectionId + '-content');
-      const icon = document.querySelector(`[onclick="toggleSection('${sectionId}')"] .toggle-icon`);
-      
-      content.classList.toggle('collapsed');
-      icon.classList.toggle('rotated');
-    }
-
-    // Page-specific render functions
-    function renderAllHabits() {
-      const container = document.getElementById('all-habits-container');
-      if (appData.habits.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">No habits yet. Add some from the dashboard!</p>';
-        return;
-      }
-      
-      container.innerHTML = `
-        <div class="entries-grid">
-          ${appData.habits.map(habit => createCompactEntry(habit)).join('')}
-        </div>
-      `;
-    }
-
-    function renderAllTasks() {
-      const container = document.getElementById('all-tasks-container');
-      if (appData.tasks.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">No tasks yet. Add some from the dashboard!</p>';
-        return;
-      }
-      
-      container.innerHTML = `
-        <div class="entries-grid">
-          ${appData.tasks.map(task => createCompactEntry(task)).join('')}
-        </div>
-      `;
-    }
-
-    function renderCalendar() {
-      // Get current calendar date (use the tracked month/year)
-      const year = currentCalendarYear;
-      const month = currentCalendarMonth;
-      
-      document.getElementById('current-month').textContent = 
-        new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      
-      const firstDay = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      
-      let html = '';
-      
-      // Empty cells for days before month starts
-      for (let i = 0; i < firstDay; i++) {
-        html += '<div class="text-center py-2 text-gray-300"></div>';
-      }
-      
-      // Days of the month
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        const dateStr = date.toISOString().split('T')[0];
-        const today = new Date();
-        const isToday = dateStr === today.toISOString().split('T')[0];
-        
-        // Count completions for this day
-        const completions = Object.keys(appData.completions).filter(key => key.endsWith('-' + dateStr)).length;
-        const totalItems = appData.habits.length + appData.tasks.length;
-        
-        let dayClass = 'text-center py-2 border rounded min-h-12 cursor-pointer hover:bg-gray-50';
-        if (isToday) dayClass += ' bg-blue-200 font-bold';
-        else if (completions > 0) dayClass += ' bg-green-200';
-        else if (date < today && totalItems > 0) dayClass += ' bg-red-100';
-        
-        html += `
-          <div class="${dayClass}">
-            <div class="font-semibold">${day}</div>
-            ${completions > 0 ? `<div class="text-xs text-green-700">${completions}/${totalItems}</div>` : ''}
-          </div>
-        `;
-      }
-      
-      document.getElementById('calendar-grid').innerHTML = html;
-    }
-
-    function renderExercisePage() {
-      // Exercise logging functionality
-      document.getElementById('log-exercise').onclick = logExercise;
-      renderExerciseHistory();
-      updateExerciseStats();
-    }
-
-    // Exercise logging with Firebase
-    function logExercise() {
-      const type = document.getElementById('exercise-type').value;
-      const duration = parseInt(document.getElementById('exercise-duration').value);
-      const notes = document.getElementById('exercise-notes').value.trim();
-      
-      if (!duration || duration <= 0) {
-        alert('Please enter a valid duration');
-        return;
-      }
-      
-      const exercise = {
-        type: type,
-        duration: duration,
-        notes: notes,
-        date: new Date().toISOString()
-      };
-      
-      // Save to Firebase
-      if (currentUser) {
-        addDoc(collection(db, 'users', currentUser.uid, 'exercises'), exercise)
-          .then(docRef => {
-            exercise.id = docRef.id;
-            appData.exercises.push(exercise);
-            renderExerciseHistory();
-            updateExerciseStats();
-          })
-          .catch(console.error);
-      }
-      
-      // Clear form
-      document.getElementById('exercise-duration').value = '';
-      document.getElementById('exercise-notes').value = '';
-    }
-
-    function renderExerciseHistory() {
-      const container = document.getElementById('exercise-history');
-      const recentExercises = appData.exercises.slice(-10).reverse();
-      
-      if (recentExercises.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">No workouts logged yet. Start by logging your first exercise above!</p>';
-        return;
-      }
-      
-      container.innerHTML = recentExercises.map(exercise => `
-        <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
-          <div>
-            <div class="font-medium">${exercise.type.charAt(0).toUpperCase() + exercise.type.slice(1)}</div>
-            <div class="text-sm text-gray-600">${exercise.duration} minutes</div>
-            ${exercise.notes ? `<div class="text-sm text-gray-500 mt-1">${exercise.notes}</div>` : ''}
-          </div>
-          <div class="text-sm text-gray-500">
-            ${new Date(exercise.date).toLocaleDateString()}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function updateExerciseStats() {
-      const totalWorkouts = appData.exercises.length;
-      const totalMinutes = appData.exercises.reduce((sum, ex) => sum + ex.duration, 0);
-      
-      // Calculate average per week (assuming data spans multiple weeks)
-      const firstExercise = appData.exercises[0];
-      const daysSinceFirst = firstExercise ? 
-        Math.max(1, Math.ceil((Date.now() - new Date(firstExercise.date).getTime()) / (1000 * 60 * 60 * 24))) : 1;
-      const avgPerWeek = Math.round((totalWorkouts / daysSinceFirst) * 7);
-      
-      document.getElementById('total-workouts').textContent = totalWorkouts;
-      document.getElementById('total-minutes').textContent = totalMinutes;
-      document.getElementById('avg-per-week').textContent = avgPerWeek;
-    }
-
-    function renderAnalytics() {
-      // Update analytics stats
-      document.getElementById('total-habits').textContent = appData.habits.length;
-      document.getElementById('total-tasks').textContent = appData.tasks.length;
-      
-      const longestStreak = Math.max(0, ...appData.habits.map(h => calculateStreak(h.id)));
-      document.getElementById('longest-streak').textContent = longestStreak;
-      
-      // Calculate average completion rate over last 7 days
-      let totalRate = 0;
-      let daysWithData = 0;
-      
-      for (let i = 0; i < 7; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        
-        const totalItems = appData.habits.length + appData.tasks.length;
-        if (totalItems > 0) {
-          const completed = Object.keys(appData.completions).filter(key => key.endsWith('-' + dateStr)).length;
-          totalRate += (completed / totalItems) * 100;
-          daysWithData++;
-        }
-      }
-      
-      const avgCompletion = daysWithData > 0 ? Math.round(totalRate / daysWithData) : 0;
-      document.getElementById('avg-completion').textContent = `${avgCompletion}%`;
-      
-      renderHabitPerformance();
-    }
-
-    function renderHabitPerformance() {
-      const container = document.getElementById('habit-performance');
-      
-      if (appData.habits.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">No habits to analyze yet.</p>';
-        return;
-      }
-      
-      const performance = appData.habits.map(habit => {
-        const streak = calculateStreak(habit.id);
-        // Calculate completion rate over last 30 days
-        let completed = 0;
-        let total = 0;
-        
-        for (let i = 0; i < 30; i++) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          const dateStr = date.toISOString().split('T')[0];
-          const completionKey = `${habit.id}-${dateStr}`;
-          
-          total++;
-          if (appData.completions[completionKey]) completed++;
-        }
-        
-        return {
-          ...habit,
-          streak,
-          completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
-        };
-      }).sort((a, b) => b.completionRate - a.completionRate);
-      
-      container.innerHTML = performance.map(habit => `
-        <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
-          <div>
-            <div class="font-medium">${habit.text}</div>
-            <div class="text-sm text-gray-600">Current streak: ${habit.streak} days</div>
-          </div>
-          <div class="text-right">
-            <div class="font-bold text-lg ${habit.completionRate >= 80 ? 'text-green-600' : habit.completionRate >= 60 ? 'text-yellow-600' : 'text-red-600'}">
-              ${habit.completionRate}%
-            </div>
-            <div class="text-xs text-gray-500">30-day rate</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Demo reset function (now just clears all data)
-    function initDemoReset() {
-      // Removed - no longer needed as we have proper sign out
-    }
-
-    // Calendar navigation
-    let currentCalendarMonth = new Date().getMonth();
-    let currentCalendarYear = new Date().getFullYear();
-
-    function initCalendarNavigation() {
-      document.getElementById('prev-month').addEventListener('click', () => {
-        currentCalendarMonth--;
-        if (currentCalendarMonth < 0) {
-          currentCalendarMonth = 11;
-          currentCalendarYear--;
-        }
-        renderCalendar();
-      });
-
-      document.getElementById('next-month').addEventListener('click', () => {
-        currentCalendarMonth++;
-        if (currentCalendarMonth > 11) {
-          currentCalendarMonth = 0;
-          currentCalendarYear++;
-        }
-        renderCalendar();
-      });
-    }
-
-    // Global click handlers for dynamically created buttons
-    window.toggleCompletion = toggleCompletion;
-    window.showDetails = showDetails;
-    window.closeDetailsModal = closeDetailsModal;
-    window.deleteItem = deleteItem;
-    window.toggleSection = toggleSection;
-    window.openVisionModal = openVisionModal;
-    window.closeVisionModal = closeVisionModal;
-    window.saveVision = saveVision;
-
-    // Initialize app when page loads - but only after authentication
-    // The actual initialization happens in the onAuthStateChanged listener
-  </script>
-</body>
-</html>
