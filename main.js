@@ -148,15 +148,15 @@ document.querySelectorAll('.sidebar-nav-item').forEach(item => {
     e.preventDefault();
     const targetPage = item.dataset.page;
     showPage(targetPage);
-    
+
     // Update active nav item
     document.querySelectorAll('.sidebar-nav-item').forEach(i => i.classList.remove('active'));
     item.classList.add('active');
-    
+
     // Update page title
     const pageTitles = {
       home: 'Dashboard',
-      habits: 'All Habits', 
+      habits: 'All Habits',
       tasks: 'All Tasks',
       calendar: 'Calendar',
       exercise: 'Exercise Tracker',
@@ -164,11 +164,11 @@ document.querySelectorAll('.sidebar-nav-item').forEach(item => {
       routines: 'Routine Manager',
       journal: 'Daily Journal'
     };
-    
+
     if (pageTitle) {
       pageTitle.textContent = pageTitles[targetPage] || 'Dashboard';
     }
-    
+
     // Close mobile menu
     if (window.innerWidth <= 768) {
       sidebar.classList.remove('open');
@@ -182,7 +182,7 @@ function showPage(pageId) {
     section.classList.remove('active');
   });
   document.getElementById(pageId + '-page').classList.add('active');
-  
+
   // Load specific page content
   if (pageId === 'habits') loadAllHabits();
   if (pageId === 'tasks') loadAllTasks();
@@ -197,7 +197,7 @@ function showPage(pageId) {
 window.toggleSection = function(sectionId) {
   const content = document.getElementById(sectionId + '-content');
   const icon = content.previousElementSibling.querySelector('.toggle-icon');
-  
+
   content.classList.toggle('collapsed');
   icon.classList.toggle('rotated');
 };
@@ -228,7 +228,7 @@ function closeQuickAdd() {
 // Edit vision handler
 editVisionBtn?.addEventListener('click', async () => {
   if (!currentUser) return;
-  
+
   const currentVision = visionSpan.textContent;
   const newVision = prompt('What is your updated vision?', currentVision);
   if (newVision && newVision !== currentVision) {
@@ -245,11 +245,11 @@ editVisionBtn?.addEventListener('click', async () => {
 // Add habit/task handler
 addHabitBtn?.addEventListener('click', async () => {
   if (!currentUser) return;
-  
+
   const name = habitInput.value.trim();
   const note = habitNote.value.trim();
   const type = habitType.value;
-  
+
   if (!name) {
     alert('Please enter a title');
     return;
@@ -265,7 +265,7 @@ addHabitBtn?.addEventListener('click', async () => {
       history: [],
       streak: 0
     });
-    
+
     closeQuickAdd();
     await loadEntries();
   } catch (error) {
@@ -280,19 +280,19 @@ journalBtn?.addEventListener('click', async () => {
     alert('Please write something in your journal');
     return;
   }
-  
+
   const today = new Date().toISOString().split('T')[0];
-  
+
   try {
     await setDoc(doc(db, 'users', currentUser.uid, 'journal', today), {
       content: journalInput.value.trim(),
       date: today,
       timestamp: Timestamp.now()
     });
-    
+
     journalStatus.textContent = 'Journal saved successfully!';
     journalStatus.className = 'text-sm text-green-600';
-    
+
     setTimeout(() => {
       journalStatus.textContent = '';
     }, 3000);
@@ -306,11 +306,11 @@ journalBtn?.addEventListener('click', async () => {
 // Exercise logging
 document.getElementById('log-exercise')?.addEventListener('click', async () => {
   if (!currentUser) return;
-  
+
   const type = document.getElementById('exercise-type')?.value;
   const duration = parseInt(document.getElementById('exercise-duration')?.value);
   const notes = document.getElementById('exercise-notes')?.value.trim();
-  
+
   if (!duration || duration <= 0) {
     alert('Please enter a valid duration');
     return;
@@ -324,13 +324,13 @@ document.getElementById('log-exercise')?.addEventListener('click', async () => {
       date: new Date().toISOString().split('T')[0],
       timestamp: Timestamp.now()
     });
-    
+
     // Clear form
     const durationEl = document.getElementById('exercise-duration');
     const notesEl = document.getElementById('exercise-notes');
     if (durationEl) durationEl.value = '';
     if (notesEl) notesEl.value = '';
-    
+
     await loadExercises();
     alert('Exercise logged successfully!');
   } catch (error) {
@@ -358,7 +358,7 @@ function initializeDragAndDrop() {
   const availableHabits = document.getElementById('available-habits');
   const dropZone = document.getElementById('routine-drop-zone');
   const routineHabitsList = document.getElementById('routine-habits-list');
-  
+
   // Make habits draggable
   if (availableHabits) {
     availableHabits.addEventListener('dragstart', (e) => {
@@ -370,28 +370,28 @@ function initializeDragAndDrop() {
       }
     });
   }
-  
+
   // Drop zone handlers
   if (dropZone) {
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
       dropZone.classList.add('drag-over');
     });
-    
+
     dropZone.addEventListener('dragleave', (e) => {
       e.preventDefault();
       dropZone.classList.remove('drag-over');
     });
-    
+
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
       dropZone.classList.remove('drag-over');
-      
+
       const data = JSON.parse(e.dataTransfer.getData('text/plain'));
       addHabitToRoutine(data.id, data.name);
     });
   }
-  
+
   // Make routine habits sortable
   if (routineHabitsList) {
     routineHabitsList.addEventListener('dragstart', (e) => {
@@ -399,16 +399,16 @@ function initializeDragAndDrop() {
         e.dataTransfer.setData('text/plain', e.target.dataset.index);
       }
     });
-    
+
     routineHabitsList.addEventListener('dragover', (e) => {
       e.preventDefault();
     });
-    
+
     routineHabitsList.addEventListener('drop', (e) => {
       e.preventDefault();
       const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
       const targetElement = e.target.closest('.routine-habit-item');
-      
+
       if (targetElement) {
         const targetIndex = parseInt(targetElement.dataset.index);
         reorderRoutineHabits(draggedIndex, targetIndex);
@@ -423,7 +423,6 @@ function addHabitToRoutine(habitId, habitName) {
     alert('This habit is already in the routine');
     return;
   }
-  
   routineHabits.push({ id: habitId, name: habitName });
   updateRoutineHabitsDisplay();
   updateDropZone();
@@ -444,7 +443,7 @@ function reorderRoutineHabits(fromIndex, toIndex) {
 function updateRoutineHabitsDisplay() {
   const container = document.getElementById('routine-habits-list');
   if (!container) return;
-  
+
   container.innerHTML = routineHabits.map((habit, index) => `
     <div class="routine-habit-item" draggable="true" data-index="${index}">
       <div class="routine-habit-order">${index + 1}</div>
@@ -460,29 +459,24 @@ function updateRoutineHabitsDisplay() {
 function updateDropZone() {
   const dropZone = document.getElementById('routine-drop-zone');
   if (!dropZone) return;
-  
-  if (routineHabits.length === 0) {
-    dropZone.innerHTML = `
-      <div class="text-lg mb-2">🎯</div>
-      <div>Drag habits from the list above to build your routine</div>
-      <div class="text-sm mt-2 opacity-75">Habits will be completed in the order you arrange them</div>
-    `;
-    dropZone.style.display = 'block';
-  } else {
-    dropZone.style.display = 'none';
-  }
+  dropZone.innerHTML = `
+    <div class="text-lg mb-2">🎯</div>
+    <div>Drag more habits here to add to your routine</div>
+    <div class="text-sm mt-2 opacity-75">Current habits: ${routineHabits.length}</div>
+  `;
+  dropZone.style.display = 'block';
 }
 
 // Load user data
 async function loadUserData() {
   if (!currentUser) return;
-  
+
   try {
     const userDocRef = doc(db, 'users', currentUser.uid);
     const userDoc = await getDoc(userDocRef);
-    
+
     if (!userDoc.exists()) {
-      await setDoc(userDocRef, { 
+      await setDoc(userDocRef, {
         vision: 'Define your future self vision here - what do you want to become?',
         createdAt: Timestamp.now()
       });
@@ -490,7 +484,7 @@ async function loadUserData() {
     } else {
       if (visionSpan) visionSpan.textContent = userDoc.data().vision;
     }
-    
+
     await loadEntries();
     await loadExercises();
     await loadRoutines();
@@ -503,21 +497,21 @@ async function loadUserData() {
 // Load routines
 async function loadRoutines() {
   if (!currentUser) return;
-  
+
   try {
     const snapshot = await getDocs(collection(db, 'users', currentUser.uid, 'routines'));
     routines = [];
-    
+
     snapshot.forEach(docSnap => {
       const data = docSnap.data();
       routines.push({ id: docSnap.id, ...data });
     });
-    
+
     // Sort routines by start time for today
     const today = new Date().getDay();
     routines = routines.filter(routine => routine.days.includes(today))
                       .sort((a, b) => a.startTime.localeCompare(b.startTime));
-    
+
   } catch (error) {
     console.error('Error loading routines:', error);
   }
@@ -526,16 +520,16 @@ async function loadRoutines() {
 // Save routine
 async function saveRoutine() {
   if (!currentUser) return;
-  
+
   const name = document.getElementById('routine-name')?.value.trim();
   const startTime = document.getElementById('routine-start-time')?.value;
   const selectedDays = Array.from(document.querySelectorAll('.routine-day:checked')).map(cb => parseInt(cb.value));
-  
+
   if (!name || !startTime || selectedDays.length === 0 || routineHabits.length === 0) {
     alert('Please fill in all fields and add at least one habit');
     return;
   }
-  
+
   try {
     await addDoc(collection(db, 'users', currentUser.uid, 'routines'), {
       name,
@@ -544,7 +538,7 @@ async function saveRoutine() {
       habits: routineHabits,
       createdAt: Timestamp.now()
     });
-    
+
     // Clear form
     const nameEl = document.getElementById('routine-name');
     const timeEl = document.getElementById('routine-start-time');
@@ -554,7 +548,7 @@ async function saveRoutine() {
     routineHabits = [];
     updateRoutineHabitsDisplay();
     updateDropZone();
-    
+
     await loadRoutines();
     loadRoutineManager();
     alert('Routine saved successfully!');
@@ -574,14 +568,14 @@ function loadRoutineManager() {
 function loadAvailableHabits() {
   const container = document.getElementById('available-habits');
   if (!container) return;
-  
+
   const habits = allEntries.filter(e => e.type === 'habit');
-  
+
   if (habits.length === 0) {
     container.innerHTML = '<p class="text-gray-500 text-sm">No habits available. Create some habits first!</p>';
     return;
   }
-  
+
   container.innerHTML = habits.map(habit => `
     <div class="draggable-habit" draggable="true" data-habit-id="${habit.id}" data-habit-name="${habit.name}">
       <span class="drag-handle">⋮⋮</span>
@@ -593,16 +587,16 @@ function loadAvailableHabits() {
 function loadExistingRoutines() {
   const container = document.getElementById('existing-routines');
   if (!container) return;
-  
+
   if (routines.length === 0) {
     container.innerHTML = '<p class="text-gray-500 text-center py-8">No routines created yet. Create your first routine above!</p>';
     return;
   }
-  
+
   container.innerHTML = routines.map(routine => {
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const daysText = routine.days.map(d => dayNames[d]).join(', ');
-    
+
     return `
       <div class="p-4 border rounded-lg">
         <div class="flex justify-between items-start mb-2">
@@ -623,7 +617,7 @@ function loadExistingRoutines() {
 // Delete routine
 window.deleteRoutine = async function(routineId) {
   if (!currentUser || !confirm('Are you sure you want to delete this routine?')) return;
-  
+
   try {
     await deleteDoc(doc(db, 'users', currentUser.uid, 'routines', routineId));
     await loadRoutines();
@@ -639,18 +633,18 @@ async function updateDashboardWithRoutines() {
   const currentRoutineContainer = document.getElementById('current-routine-container');
   const upcomingRoutinesList = document.getElementById('upcoming-routines-list');
   const originalDashboard = document.getElementById('original-dashboard');
-  
+
   if (!currentRoutineContainer || !upcomingRoutinesList || !originalDashboard) return;
-  
+
   // Get current time and day
   const now = new Date();
   const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
   const currentDay = now.getDay();
-  
+
   // Get today's routines
   const todaysRoutines = routines.filter(routine => routine.days.includes(currentDay))
                                .sort((a, b) => a.startTime.localeCompare(b.startTime));
-  
+
   // Find current active routine
   let activeRoutine = null;
   for (const routine of todaysRoutines) {
@@ -659,17 +653,17 @@ async function updateDashboardWithRoutines() {
       break;
     }
   }
-  
+
   if (activeRoutine) {
-    // Show current routine
+    // Show current routine AT THE TOP, but keep everything else visible
     currentRoutine = activeRoutine;
     currentRoutineContainer.innerHTML = await createRoutineCard(activeRoutine);
-    
+
     // Show upcoming routines
     const upcomingRoutines = todaysRoutines.filter(r => 
       r.startTime > currentTime || (r.startTime <= currentTime && r.completed)
     );
-    
+
     if (upcomingRoutines.length > 0) {
       upcomingRoutinesList.innerHTML = upcomingRoutines.map(routine => `
         <div class="upcoming-routine">
@@ -680,13 +674,14 @@ async function updateDashboardWithRoutines() {
     } else {
       upcomingRoutinesList.innerHTML = '<p class="text-gray-500 text-sm">No more routines for today</p>';
     }
-    
-    // Hide original dashboard
-    originalDashboard.style.display = 'none';
+
+    // KEEP ORIGINAL DASHBOARD VISIBLE - This is the key fix!
+    originalDashboard.style.display = 'grid';
+    loadOriginalDashboard();
   } else {
-    // No active routine, show original dashboard
+    // No active routine, just clear the routine container
     currentRoutineContainer.innerHTML = '';
-    
+
     if (todaysRoutines.length > 0) {
       const nextRoutines = todaysRoutines.filter(r => r.startTime > currentTime);
       if (nextRoutines.length > 0) {
@@ -702,7 +697,7 @@ async function updateDashboardWithRoutines() {
     } else {
       upcomingRoutinesList.innerHTML = '<p class="text-gray-500 text-sm">No routines scheduled for today</p>';
     }
-    
+
     // Show original dashboard content
     originalDashboard.style.display = 'grid';
     loadOriginalDashboard();
@@ -724,10 +719,10 @@ async function createRoutineCard(routine) {
       </div>
     </div>
   `).join('');
-  
+
   const completedCount = routine.habits.filter(h => h.completed || h.wontComplete).length;
   const totalCount = routine.habits.length;
-  
+
   return `
     <div class="routine-card">
       <div class="routine-content">
@@ -748,13 +743,13 @@ async function createRoutineCard(routine) {
 window.toggleRoutineHabit = async function(routineId, habitId) {
   const routine = routines.find(r => r.id === routineId);
   if (!routine) return;
-  
+
   const habit = routine.habits.find(h => h.id === habitId);
   if (!habit) return;
-  
+
   habit.completed = !habit.completed;
   habit.wontComplete = false; // Reset won't complete if toggling
-  
+
   await updateRoutineInDatabase(routine);
   await checkRoutineCompletion(routine);
 };
@@ -763,13 +758,13 @@ window.toggleRoutineHabit = async function(routineId, habitId) {
 window.markHabitWontComplete = async function(routineId, habitId) {
   const routine = routines.find(r => r.id === routineId);
   if (!routine) return;
-  
+
   const habit = routine.habits.find(h => h.id === habitId);
   if (!habit) return;
-  
+
   habit.wontComplete = !habit.wontComplete;
   habit.completed = false; // Reset completed if marking won't complete
-  
+
   await updateRoutineInDatabase(routine);
   await checkRoutineCompletion(routine);
 };
@@ -778,14 +773,14 @@ window.markHabitWontComplete = async function(routineId, habitId) {
 window.completeEntireRoutine = async function(routineId) {
   const routine = routines.find(r => r.id === routineId);
   if (!routine) return;
-  
+
   // Mark all incomplete habits as completed
   routine.habits.forEach(habit => {
     if (!habit.completed && !habit.wontComplete) {
       habit.completed = true;
     }
   });
-  
+
   await updateRoutineInDatabase(routine);
   await checkRoutineCompletion(routine);
 };
@@ -793,16 +788,16 @@ window.completeEntireRoutine = async function(routineId) {
 // Check if routine is complete and trigger celebration
 async function checkRoutineCompletion(routine) {
   const allDone = routine.habits.every(h => h.completed || h.wontComplete);
-  
+
   if (allDone) {
     // Trigger celebration
     playCompletionSound();
     showRoutineCelebration(routine.name);
-    
+
     // Mark routine as completed
     routine.completed = true;
     await updateRoutineInDatabase(routine);
-    
+
     // Update dashboard to show next routine
     setTimeout(() => {
       updateDashboardWithRoutines();
@@ -819,8 +814,80 @@ async function checkRoutineCompletion(routine) {
 // Update routine in database
 async function updateRoutineInDatabase(routine) {
   if (!currentUser) return;
-  
+
   try {
     await updateDoc(doc(db, 'users', currentUser.uid, 'routines', routine.id), {
       habits: routine.habits,
-      completed: routine.completed ||
+      completed: routine.completed || false
+    });
+  } catch (error) {
+    console.error('Error updating routine:', error);
+  }
+}
+
+function loadOriginalDashboard() {
+  // This function would render the main dashboard contents if you have specific logic.
+  // If not necessary, you can leave this blank.
+}
+
+// Place this at the END of your existing main.js file, after all other code and event listeners
+
+// --- SETTINGS PANEL & DARK MODE ---
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const closeSettingsBtn = document.getElementById('close-settings-modal');
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+function openSettingsModal() {
+  settingsModal.style.display = 'flex';
+  // Set toggle based on theme
+  const theme = localStorage.getItem('theme');
+  darkModeToggle.checked = (theme === 'dark');
+}
+function closeSettingsModal() {
+  settingsModal.style.display = 'none';
+}
+
+// Settings button opens modal
+if (settingsBtn && settingsModal) {
+  settingsBtn.addEventListener('click', openSettingsModal);
+}
+if (closeSettingsBtn && settingsModal) {
+  closeSettingsBtn.addEventListener('click', closeSettingsModal);
+}
+
+// Dark mode toggle logic
+if (darkModeToggle) {
+  darkModeToggle.addEventListener('change', function() {
+    setTheme(this.checked ? 'dark' : 'light');
+  });
+}
+
+function setTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+    if (darkModeToggle) darkModeToggle.checked = true;
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+    if (darkModeToggle) darkModeToggle.checked = false;
+  }
+}
+
+// On page load, apply theme
+(function initTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    setTheme('dark');
+  } else {
+    setTheme('light');
+  }
+})();
+
+// Close modal if clicking outside modal content
+window.addEventListener('click', function(event) {
+  if (event.target === settingsModal) {
+    closeSettingsModal();
+  }
+});
