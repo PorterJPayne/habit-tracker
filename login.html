@@ -1,85 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Habit Tracker - Sign In</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f2f2f2;
-    }
-    .container {
-      text-align: center;
-      background-color: white;
-      padding: 2em;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    button {
-      background-color: #4285F4;
-      color: white;
-      border: none;
-      padding: 1em 2em;
-      border-radius: 6px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #357ae8;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Habit Tracker</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Welcome to Habit Tracker</h1>
-    <p>Sign in to start tracking your habits</p>
-    <button id="google-sign-in">Sign in with Google</button>
+  <div id="login-overlay" class="overlay">
+    <div class="login-box">
+      <h1>Welcome to Habit Tracker</h1>
+      <button id="google-sign-in" class="sign-in-btn">Sign in with Google</button>
+    </div>
   </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithRedirect,
-      getRedirectResult,
-    } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBstpAtUtpV9JuVqWetD7FhpNDppgAYGCs",
-      authDomain: "habit-tracker-7c16d.firebaseapp.com",
-      projectId: "habit-tracker-7c16d",
-      storageBucket: "habit-tracker-7c16d.appspot.com",
-      messagingSenderId: "329214838371",
-      appId: "1:329214838371:web:4d50e8ddedffc72defda56",
-      measurementId: "G-22KVBFSEL5"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    document.getElementById("google-sign-in").addEventListener("click", () => {
-      signInWithRedirect(auth, provider);
-    });
-
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result && result.user) {
-          window.location.href = "index.html"; // redirect to app after sign in
-        }
-      })
-      .catch((error) => {
-        console.error("Sign-in error:", error);
-        alert("Failed to sign in: " + error.message);
-      });
-  </script>
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h2>Habit Tracker</h2>
+    </div>
+    <nav>
+      <ul>
+        <li class="sidebar-nav-item active" data-page="home">Dashboard</li>
+        <li class="sidebar-nav-item" data-page="habits">Habits</li>
+        <li class="sidebar-nav-item" data-page="tasks">Tasks</li>
+        <li class="sidebar-nav-item" data-page="calendar">Calendar</li>
+        <li class="sidebar-nav-item" data-page="exercise">Exercise</li>
+        <li class="sidebar-nav-item" data-page="analytics">Analytics</li>
+        <li class="sidebar-nav-item" data-page="routines">Routines</li>
+        <li class="sidebar-nav-item" data-page="journal">Journal</li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <span id="user-name">Loading...</span>
+      <button id="settings-btn" class="w-full bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors text-sm mb-2">
+        ⚙️ Settings
+      </button>
+      <button id="sign-out" class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-sm">
+        Sign Out
+      </button>
+    </div>
+  </aside>
+  <div id="sidebar-overlay"></div>
+  <main>
+    <header class="main-header">
+      <button id="mobile-menu-btn" class="mobile-menu-btn">☰</button>
+      <h1 id="page-title">Dashboard</h1>
+      <span id="current-date"></span>
+    </header>
+    <!-- Routine and Upcoming -->
+    <section>
+      <div id="current-routine-container"></div>
+      <div id="upcoming-routines-list"></div>
+    </section>
+    <!-- Main Dashboard -->
+    <section id="original-dashboard" class="dashboard-grid">
+      <div class="stat-item">
+        <div class="stat-number" id="habits-completed">0</div>
+        <div class="stat-label">Habits Today</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="tasks-completed">0</div>
+        <div class="stat-label">Tasks Today</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="streak-count">0</div>
+        <div class="stat-label">Best Streak</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="completion-rate">0%</div>
+        <div class="stat-label">Today's Rate</div>
+      </div>
+      <section class="bg-white">
+        <h2>Your Vision</h2>
+        <span id="identity-vision"></span>
+        <button id="edit-vision">Edit</button>
+      </section>
+      <section class="bg-white">
+        <h2>Add Habit or Task</h2>
+        <div id="quick-add-container">
+          <div id="add-prompt">+ Add New</div>
+          <form id="add-form">
+            <input id="habit-input" placeholder="Title" />
+            <input id="habit-note" placeholder="Notes (optional)" />
+            <select id="habit-type">
+              <option value="habit">Habit</option>
+              <option value="task">Task</option>
+            </select>
+            <button type="button" id="add-habit">Add</button>
+          </form>
+        </div>
+      </section>
+      <section class="bg-white">
+        <h2>Today's Focus</h2>
+        <div id="todays-items"></div>
+      </section>
+      <section class="bg-white">
+        <h2>Completed Today</h2>
+        <div id="completed-items"></div>
+      </section>
+    </section>
+    <!-- Routine Manager, Habits, Tasks, Calendar, etc. pages go here -->
+    <section id="habits-page" class="page-section"></section>
+    <section id="tasks-page" class="page-section"></section>
+    <section id="calendar-page" class="page-section"></section>
+    <section id="exercise-page" class="page-section"></section>
+    <section id="analytics-page" class="page-section"></section>
+    <section id="routines-page" class="page-section"></section>
+    <section id="journal-page" class="page-section"></section>
+  </main>
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal" style="display:none;">
+    <div class="modal-content settings-modal-content">
+      <button class="close-btn" id="close-settings-modal">&times;</button>
+      <h2 class="text-xl font-bold mb-4">Settings</h2>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <label class="text-sm font-medium">Dark Mode</label>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="dark-mode-toggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
